@@ -50,7 +50,7 @@ const Student = () => {
           }}
         />
 
-        <div className="relative z-10 w-full max-w-2xl bg-white/60 rounded-xl shadow-lg p-8 m-15 ">
+        <div className="relative z-10 w-full max-w-2xl bg-white/60 rounded-xl shadow-lg p-8 m-10 ">
           <h2 className="text-3xl custom-text font-extrabold text-[#db6d00] mb-6 text-center leading-none">
             Register
           </h2>
@@ -67,7 +67,7 @@ const Student = () => {
                 value={formData.lastName}
                 onChange={handleChange}
                 className="w-full  bg-[#043b64]/20 focus:bg-[#043b64]/10 px-3 py-2 border rounded-3xl focus:outline-none focus:ring-2 focus:ring-[#db6d00]"
-                required
+                //required
               />
               <input
                 type="text"
@@ -76,7 +76,7 @@ const Student = () => {
                 value={formData.firstName}
                 onChange={handleChange}
                 className="w-full  bg-[#043b64]/20 focus:bg-[#043b64]/10 px-3 py-2 border rounded-3xl focus:outline-none focus:ring-2 focus:ring-[#db6d00]"
-                required
+                //required
               />
             </div>
 
@@ -96,7 +96,7 @@ const Student = () => {
                 value={formData.srCode}
                 onChange={handleChange}
                 className="w-full  bg-[#043b64]/20 focus:bg-[#043b64]/10 px-3 py-2 border rounded-3xl focus:outline-none focus:ring-2 focus:ring-[#db6d00]"
-                required
+                //required
               />
             </div>
 
@@ -108,7 +108,7 @@ const Student = () => {
                 value={formData.school}
                 onChange={handleChange}
                 className="w-full  bg-[#043b64]/20 focus:bg-[#043b64]/10 px-3 py-2 border rounded-3xl focus:outline-none focus:ring-2 focus:ring-[#db6d00]"
-                required
+                //required
               />
               <input
                 type="text"
@@ -117,7 +117,7 @@ const Student = () => {
                 value={formData.yearandSection}
                 onChange={handleChange}
                 className="w-full  bg-[#043b64]/20 focus:bg-[#043b64]/10 px-3 py-2 border rounded-3xl focus:outline-none focus:ring-2 focus:ring-[#db6d00]"
-                required
+                //required
               />
             </div>
 
@@ -128,7 +128,7 @@ const Student = () => {
               value={formData.email}
               onChange={handleChange}
               className="w-full  bg-[#043b64]/20 focus:bg-[#043b64]/10 px-3 py-2 border rounded-3xl focus:outline-none focus:ring-2 focus:ring-[#db6d00]"
-              required
+              //required
             />
 
             <div className="grid grid-cols-2 gap-4">
@@ -139,7 +139,7 @@ const Student = () => {
                 value={formData.password}
                 onChange={handleChange}
                 className="w-full  bg-[#043b64]/20 focus:bg-[#043b64]/10 px-3 py-2 border rounded-3xl focus:outline-none focus:ring-2 focus:ring-[#db6d00]"
-                required
+                //required
               />
               <input
                 type="password"
@@ -148,12 +148,12 @@ const Student = () => {
                 value={formData.confirmPassword}
                 onChange={handleChange}
                 className="w-full  bg-[#043b64]/20 focus:bg-[#043b64]/10 px-3 py-2 border rounded-3xl focus:outline-none focus:ring-2 focus:ring-[#db6d00]"
-                required
+                //required
               />
             </div>
 
             <div className="flex mt-10 justify-center mb-6 items-center">
-              <input type="checkbox" id="terms" className="mr-2" required />
+              <input type="checkbox" id="terms" className="mr-2" />
               <label htmlFor="terms" className="text-sm text-gray-600">
                 I have read and agreed to the 
                 <span className="text-[#db6d00] ml-1 hover:underline cursor-pointer">Terms and Conditions</span>
@@ -162,6 +162,7 @@ const Student = () => {
 
             <button
               type="submit"
+              onClick={() => navigate("/student-dashboard")}
               className="w-full cursor-pointer bg-black text-white py-2 rounded-3xl hover:bg-gray-800 transition duration-300"
             >
               Sign Up
