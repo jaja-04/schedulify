@@ -57,7 +57,7 @@ const Landing = () => {
                 I am a Student
               </button>
               <button
-                onClick={() => navigate("/faculty")}
+                onClick={() => navigate("/faculty-register")}
                 className="bg-[#fa8606] mt-4 w-70 h-14 font-semibold rounded-[30px] p-3 hover:scale-110 hover:bg-[#db6d00] transition-all duration-300"
               >
                 Faculty Member

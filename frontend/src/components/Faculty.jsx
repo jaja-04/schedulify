@@ -1,17 +1,18 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom"; 
+import { Link, useNavigate } from "react-router-dom";
 import bgImage from "../assets/1.png";
 
-const Student = () => {
+const Faculty = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     lastName: "",
     firstName: "",
     middleName: "",
     email: "",
-    srCode: "",
-    school:"",
-    yearandSection: "",
+    employeeCode: "",
+    school: "",
+    department: "",
+    program: "",
     password: "",
     confirmPassword: "",
   });
@@ -29,7 +30,6 @@ const Student = () => {
     // Add form submission logic here
     console.log(formData);
   };
-
   return (
     <div
       style={{
@@ -55,7 +55,7 @@ const Student = () => {
             Register
           </h2>
           <p className="text-center custom-text text-sm text-gray-600 -mt-4 mb-10">
-            New Student Registration
+            New Faculty Registration
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -91,30 +91,9 @@ const Student = () => {
               />
               <input
                 type="text"
-                name="srCode"
-                placeholder="SR Code"
-                value={formData.srCode}
-                onChange={handleChange}
-                className="w-full  bg-[#043b64]/20 focus:bg-[#043b64]/10 px-3 py-2 border rounded-3xl focus:outline-none focus:ring-2 focus:ring-[#db6d00]"
-                required
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <input
-                type="text"
-                name="school"
-                placeholder="School"
-                value={formData.school}
-                onChange={handleChange}
-                className="w-full  bg-[#043b64]/20 focus:bg-[#043b64]/10 px-3 py-2 border rounded-3xl focus:outline-none focus:ring-2 focus:ring-[#db6d00]"
-                required
-              />
-              <input
-                type="text"
-                name="yearandSection"
-                placeholder="Year/Section"
-                value={formData.yearandSection}
+                name="employeeCode"
+                placeholder="Employee Code"
+                value={formData.employeeCode}
                 onChange={handleChange}
                 className="w-full  bg-[#043b64]/20 focus:bg-[#043b64]/10 px-3 py-2 border rounded-3xl focus:outline-none focus:ring-2 focus:ring-[#db6d00]"
                 required
@@ -130,6 +109,37 @@ const Student = () => {
               className="w-full  bg-[#043b64]/20 focus:bg-[#043b64]/10 px-3 py-2 border rounded-3xl focus:outline-none focus:ring-2 focus:ring-[#db6d00]"
               required
             />
+
+            <input
+              type="school"
+              name="school"
+              placeholder="School"
+              value={formData.school}
+              onChange={handleChange}
+              className="w-full  bg-[#043b64]/20 focus:bg-[#043b64]/10 px-3 py-2 border rounded-3xl focus:outline-none focus:ring-2 focus:ring-[#db6d00]"
+              required
+            />
+
+            <div className="grid grid-cols-2 gap-4">
+              <input
+                type="text"
+                name="department"
+                placeholder="Department"
+                value={formData.department}
+                onChange={handleChange}
+                className="w-full  bg-[#043b64]/20 focus:bg-[#043b64]/10 px-3 py-2 border rounded-3xl focus:outline-none focus:ring-2 focus:ring-[#db6d00]"
+                required
+              />
+              <input
+                type="text"
+                name="program"
+                placeholder="Program"
+                value={formData.program}
+                onChange={handleChange}
+                className="w-full  bg-[#043b64]/20 focus:bg-[#043b64]/10 px-3 py-2 border rounded-3xl focus:outline-none focus:ring-2 focus:ring-[#db6d00]"
+                required
+              />
+            </div>
 
             <div className="grid grid-cols-2 gap-4">
               <input
@@ -155,8 +165,10 @@ const Student = () => {
             <div className="flex mt-10 justify-center mb-6 items-center">
               <input type="checkbox" id="terms" className="mr-2" required />
               <label htmlFor="terms" className="text-sm text-gray-600">
-                I have read and agreed to the 
-                <span className="text-[#db6d00] ml-1 hover:underline cursor-pointer">Terms and Conditions</span>
+                I have read and agreed to the
+                <span className="text-[#db6d00] ml-1 hover:underline cursor-pointer">
+                  Terms and Conditions
+                </span>
               </label>
             </div>
 
@@ -171,7 +183,7 @@ const Student = () => {
               <span className="text-gray-600">
                 Already Registered?
                 <Link
-                  to="/student-login"
+                  to="/faculty-login"
                   className="text-[#db6d00] cursor-pointer ml-1 hover:underline"
                 >
                   Login
@@ -185,4 +197,4 @@ const Student = () => {
   );
 };
 
-export default Student;
+export default Faculty;
