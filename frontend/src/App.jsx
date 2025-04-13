@@ -8,12 +8,10 @@ import Student_login from "./components/Student_login";
 import Faculty_login from "./components/Faculty_login";
 import Admin_login from "./components/Admin_login";
 import Student_dashboard from "./components/Student_dashboard";
-import Student_help from "./components/Student_Help";
 import Student_ManageCourse from "./components/Student_ManageCourses";
 import Student_schedule from "./components/Student_schedule";
 import Student_account from "./components/Student_ManageCourses";
-import Faculty_dashboard from "./components/Faculty_dashboard"; // Make sure you have this
-import ProtectedRoute from "./components/ProtectedRoute"; // 👈 Add this
+
 
 const App = () => {
   return (
@@ -27,20 +25,10 @@ const App = () => {
         <Route path="Admin-register" element={<Admin />} />
         <Route path="admin-login" element={<Admin_login />} />
         <Route path="student-dashboard" element={<Student_dashboard />} />
-        <Route path="student-help" element={<Student_help />} />
-        <Route path="student-manage" element={<Student_ManageCourse />} />
-        <Route path="student-schedule" element={<Student_schedule />} />
-        <Route path="student-account" element={<Student_account />} />
-
-        {/* 🔐 Protected Faculty Dashboard Route */}
-        <Route 
-          path="faculty-dashboard" 
-          element={
-            <ProtectedRoute>
-              <Faculty_dashboard />
-            </ProtectedRoute>
-          } 
-        />
+        <Route path="student-help" element={<Student_help/>}/>
+        <Route path="student-manage" element={<Student_ManageCourse/>}/>
+        <Route path="student-schedule" element={<Student_schedule/>}/>
+        <Route path="student-account" element={<Student_account/>}/>
       </Routes>
     </Router>
   );
