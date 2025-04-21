@@ -25,11 +25,42 @@ const Faculty = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Add form submission logic here
-    console.log(formData);
-  };
+// Faculty.jsx - update the handleSubmit function if needed
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  
+  // Validate passwords match
+  if (formData.password !== formData.confirmPassword) {
+    alert("Passwords do not match");
+    return;
+  }
+  
+  try {
+    // Remove confirmPassword before sending to API
+    const { confirmPassword, ...dataToSubmit } = formData;
+    
+    const response = await fetch('http://localhost:4000/api/faculty/signup', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(dataToSubmit),
+    });
+
+    const data = await response.json();
+    
+    if (response.ok) {
+      alert('Registration successful!');
+      navigate('/faculty-login'); // Redirect to login
+    } else {
+      alert(data.message || 'Registration failed. Please try again.');
+    }
+  } catch (error) {
+    console.error('Error during registration:', error);
+    alert('Network error. Please try again later.');
+  }
+};
+  
   return (
     <div
       style={{
