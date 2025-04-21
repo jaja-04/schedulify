@@ -1,15 +1,43 @@
 import bgImage from "../assets/1.png";
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom"; 
+import { Link, useNavigate } from "react-router-dom";
 
 const Faculty_login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
-  const handleLogin = (e) => {
-    e.preventDefault();
-    console.log("Login attempted with:", { email, password });
-  };
+// Faculty_login.jsx - update the handleLogin function
+const handleLogin = async (e) => {
+  e.preventDefault();
+  console.log("Login attempted with:", { email, password });
+
+  try {
+    const response = await fetch('http://localhost:4000/api/faculty/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, password }),
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      // Store token and faculty info in localStorage for future authenticated requests
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('facultyInfo', JSON.stringify(data.faculty));
+      
+      alert('Login successful!');
+      navigate('/faculty-dashboard'); // Redirect to dashboard
+    } else {
+      alert(data.message || 'Login failed. Please try again.');
+    }
+  } catch (error) {
+    console.error('Error during login:', error);
+    alert('Network error. Please try again later.');
+  }
+};
 
   return (
     <div
