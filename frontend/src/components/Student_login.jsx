@@ -3,12 +3,42 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom"; 
 
 const Student_login = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const navigate = useNavigate();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
-  const handleLogin = (e) => {
+  const handleEmailChange = (e) => setEmail(e.target.value);
+  const handlePasswordChange = (e) => setPassword(e.target.value);
+
+  const handleLogin = async (e) => {
     e.preventDefault();
     console.log("Login attempted with:", { email, password });
+
+    try {
+      const response = await fetch('http://localhost:4000/api/student/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Store token and student info in localStorage for future authenticated requests
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('studentInfo', JSON.stringify(data.student));
+        
+        alert('Login successful!');
+        navigate('/student-dashboard'); // Redirect to student dashboard
+      } else {
+        alert(data.message || 'Login failed. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error during login:', error);
+      alert('Network error. Please try again later.');
+    }
   };
 
   return (
