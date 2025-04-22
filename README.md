@@ -10,3 +10,5 @@ Schedulify is an automated course scheduling system designed to efficiently allo
 
 That's it! Schedulify simplifies course scheduling with ease.
 
+MAM MERCE
+
