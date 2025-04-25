@@ -2,42 +2,21 @@ import bgImage from "../assets/1.png";
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
-const Faculty_login = () => {
+const FacultyLogin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const navigate = useNavigate();
+  const navigate = useNavigate();   // ⭐ useNavigate hook
 
-// Faculty_login.jsx - update the handleLogin function
-const handleLogin = async (e) => {
-  e.preventDefault();
-  console.log("Login attempted with:", { email, password });
+  const handleLogin = (e) => {
+    e.preventDefault();
 
-  try {
-    const response = await fetch('http://localhost:4000/api/faculty/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ email, password }),
-    });
-
-    const data = await response.json();
-
-    if (response.ok) {
-      // Store token and faculty info in localStorage for future authenticated requests
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('facultyInfo', JSON.stringify(data.faculty));
-      
-      alert('Login successful!');
-      navigate('/faculty-dashboard'); // Redirect to dashboard
+    // 🔒 very simple, client‑side credential check (for demo purposes only!)
+    if (email === "faculty@example.com" && password === "faculty123") {
+      navigate("/faculty-dashboard");   // ✅ go to dashboard
     } else {
-      alert(data.message || 'Login failed. Please try again.');
+      alert("Invalid credentials, please try again.");  // ❌ fail
     }
-  } catch (error) {
-    console.error('Error during login:', error);
-    alert('Network error. Please try again later.');
-  }
-};
+  };
 
   return (
     <div
@@ -50,7 +29,6 @@ const handleLogin = async (e) => {
       }}
     >
       <div className="min-h-screen flex relative">
-        {/* Background image effect */}
         <div
           className="absolute inset-0 bg-cover bg-center opacity-30"
           style={{
@@ -60,74 +38,43 @@ const handleLogin = async (e) => {
         />
 
         <div className="relative z-10 w-full max-w-2xl bg-white/60 rounded-xl shadow-lg ml-[800px] p-8 m-15">
-          <h2 className="text-3xl custom-text font-extrabold text-[#db6d00] mb-6 text-center leading-none">
+          <h2 className="text-3xl font-extrabold text-[#db6d00] mb-6 text-center">
             Login
           </h2>
-
-          <p className="text-center custom-text text-sm text-gray-600 -mt-4 mb-10">
+          <p className="text-center text-sm text-gray-600 mb-8">
             Welcome Faculty!
           </p>
 
           <form onSubmit={handleLogin} className="space-y-4">
-            <div className="space-y-2">
-              <label
-                htmlFor="email"
-                className="text-center custom-text text-sm text-gray-600 -mt-4 mb-10"
-              >
-                Email
-              </label>
+            <label className="block">
+              <span className="text-sm">Email</span>
               <input
-                id="email"
                 type="email"
+                className="w-full bg-[#043b64]/20 px-3 py-2 border rounded-3xl focus:outline-none focus:ring-2 focus:ring-[#db6d00]"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full  bg-[#043b64]/20 focus:bg-[#043b64]/10 px-3 py-2 border rounded-3xl focus:outline-none focus:ring-2 focus:ring-[#db6d00]"
                 required
               />
-            </div>
+            </label>
 
-            <div className="space-y-2">
-              <label
-                htmlFor="password"
-                className="text-center custom-text text-sm text-gray-600 -mt-4 mb-10"
-              >
-                Password
-              </label>
+            <label className="block">
+              <span className="text-sm">Password</span>
               <input
-                id="password"
                 type="password"
+                className="w-full bg-[#043b64]/20 px-3 py-2 border rounded-3xl focus:outline-none focus:ring-2 focus:ring-[#db6d00]"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full  bg-[#043b64]/20 focus:bg-[#043b64]/10 px-3 py-2 border rounded-3xl focus:outline-none focus:ring-2 focus:ring-[#db6d00]"
                 required
               />
-            </div>
-
-            <div className="text-center">
-              <a
-                href="#"
-                className="text-center custom-text text-sm text-gray-600 -mt-4 mb-10 cursor-pointer hover:underline"
-              >
-                Forgot Password?
-              </a>
-            </div>
+            </label>
 
             <button
               type="submit"
-              className="w-full cursor-pointer bg-black text-white py-2 rounded-3xl hover:bg-gray-800 transition duration-300"
+              className="w-full bg-black text-white py-2 rounded-3xl hover:bg-gray-800 transition"
             >
               Login
             </button>
 
-            <div className="text-center mt-4 text-gray-600">
-              Don't have an account?
-              <Link
-                  to="/faculty-register"
-                  className="text-[#db6d00] cursor-pointer ml-1 hover:underline"
-                >
-                  Register
-                </Link>
-            </div>
           </form>
         </div>
       </div>
@@ -135,4 +82,4 @@ const handleLogin = async (e) => {
   );
 };
 
-export default Faculty_login;
+export default FacultyLogin;

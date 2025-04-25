@@ -5,14 +5,22 @@ import { Link, useNavigate } from "react-router-dom";
 
 const Admin_login = () => {
   const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-  
-    const handleLogin = (e) => {
-      e.preventDefault();
-      console.log("Login attempted with:", { email, password });
-    };
-  
-    return (
+  const [password, setPassword] = useState("");
+  const navigate = useNavigate();  // Use the useNavigate hook to navigate after login
+
+  const handleLogin = (e) => {
+    e.preventDefault();
+    // Here you can add your authentication logic. For example:
+    if (email === "admin@example.com" && password === "admin123") {
+      // If login is successful, navigate to the admin dashboard
+      navigate("/admin-dashboard");
+    } else {
+      // If login fails, you could show an error message or alert
+      alert("Invalid credentials, please try again.");
+    }
+  };
+
+  return (
       <div
         style={{
           backgroundImage: `url(${bgImage})`,
@@ -87,20 +95,11 @@ const Admin_login = () => {
   
               <button
                 type="submit"
+                onClick={() => navigate("/admin-dashboard")}
                 className="w-full cursor-pointer bg-black text-white py-2 rounded-3xl hover:bg-gray-800 transition duration-300"
               >
                 Login
               </button>
-  
-              <div className="text-center mt-4 text-gray-600">
-                Don't have an account?
-                <Link
-                    to="/admin-register"
-                    className="text-[#db6d00] cursor-pointer ml-1 hover:underline"
-                  >
-                    Register
-                  </Link>
-              </div>
             </form>
           </div>
         </div>
