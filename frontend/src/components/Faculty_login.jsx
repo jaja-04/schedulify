@@ -75,15 +75,6 @@ const FacultyLogin = () => {
               Login
             </button>
 
-            <p className="text-center text-sm text-gray-600">
-              Don&apos;t have an account?
-              <Link
-                to="/faculty-register"
-                className="text-[#db6d00] ml-1 hover:underline"
-              >
-                Register
-              </Link>
-            </p>
           </form>
         </div>
       </div>

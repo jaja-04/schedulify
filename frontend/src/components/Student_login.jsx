@@ -121,16 +121,6 @@ const Student_login = () => {
             >
               Login
             </button>
-
-            <div className="text-center mt-4 text-gray-600">
-              Don't have an account?
-              <Link
-                  to="/student-register"
-                  className="text-[#db6d00] cursor-pointer ml-1 hover:underline"
-                >
-                  Register
-                </Link>
-            </div>
           </form>
         </div>
       </div>

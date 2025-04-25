@@ -20,6 +20,7 @@ import Faculty_ManageCourses from "./components/Faculty_ManageCourses";
 import Faculty_ManageAvailability from "./components/Faculty_ManageAvailability";
 import AdminDashboard from "./components/AdminDashboard";
 import Admin_ManageSchedule from "./components/Admin_ManageSchedule";
+import Login from "./components/sign-in/Login";
 
 
 
@@ -30,6 +31,7 @@ const App = () => {
     <Router>
       <Routes>
         <Route path="/" element={<Landing />} />
+        <Route path="rolebase-register" element={<Login />} />
         <Route path="student-register" element={<Student />} />
         <Route path="student-login" element={<Student_login />} />
         <Route path="Faculty-register" element={<Faculty />} />
