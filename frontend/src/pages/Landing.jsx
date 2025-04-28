@@ -50,24 +50,24 @@ const Landing = () => {
               !
             </h1>
             <div className="flex flex-col mt-10 items-center">
-              <button
+              {/* <button
                 onClick={() => navigate("/rolebase-register")}
                 className="bg-[#fa8606] mt-15 w-70 h-14 cursor-pointer font-semibold rounded-[30px] p-3 hover:scale-110 hover:bg-[#db6d00] transition-all duration-300"
               >
                 Role Base Login
-              </button>
+              </button> */}
               <button
                 onClick={() => navigate("/student-login")}
                 className="bg-[#fa8606] mt-15 w-70 h-14 cursor-pointer font-semibold rounded-[30px] p-3 hover:scale-110 hover:bg-[#db6d00] transition-all duration-300"
               >
                 I am a Student
               </button>
-              <button
+              {/* <button
                 onClick={() => navigate("/faculty-login")}
                 className="bg-[#fa8606] mt-4 w-70 h-14 cursor-pointer font-semibold rounded-[30px] p-3 hover:scale-110 hover:bg-[#db6d00] transition-all duration-300"
               >
                 Faculty Member
-              </button>
+              </button> */}
               <button
                 onClick={() => navigate("/admin-login")}
                 className="bg-[#fa8606] mt-4 w-70 h-14 cursor-pointer font-semibold rounded-[30px] p-3 hover:scale-110 hover:bg-[#db6d00] transition-all duration-300"
