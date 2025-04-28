@@ -3,12 +3,42 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom"; 
 
 const Student_login = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const navigate = useNavigate();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
-  const handleLogin = (e) => {
+  const handleEmailChange = (e) => setEmail(e.target.value);
+  const handlePasswordChange = (e) => setPassword(e.target.value);
+
+  const handleLogin = async (e) => {
     e.preventDefault();
     console.log("Login attempted with:", { email, password });
+
+    try {
+      const response = await fetch('http://localhost:4000/api/student/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Store token and student info in localStorage for future authenticated requests
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('studentInfo', JSON.stringify(data.student));
+        
+        alert('Login successful!');
+        navigate('/student-dashboard'); // Redirect to student dashboard
+      } else {
+        alert(data.message || 'Login failed. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error during login:', error);
+      alert('Network error. Please try again later.');
+    }
   };
 
   return (
@@ -86,20 +116,11 @@ const Student_login = () => {
 
             <button
               type="submit"
+              onClick={() => navigate("/student-dashboard")}
               className="w-full cursor-pointer bg-black text-white py-2 rounded-3xl hover:bg-gray-800 transition duration-300"
             >
               Login
             </button>
-
-            <div className="text-center mt-4 text-gray-600">
-              Don't have an account?
-              <Link
-                  to="/student-register"
-                  className="text-[#db6d00] cursor-pointer ml-1 hover:underline"
-                >
-                  Register
-                </Link>
-            </div>
           </form>
         </div>
       </div>

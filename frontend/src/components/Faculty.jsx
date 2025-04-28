@@ -174,6 +174,7 @@ const Faculty = () => {
 
             <button
               type="submit"
+              onClick={() => navigate("/faculty-dashboard")}
               className="w-full cursor-pointer bg-black text-white py-2 rounded-3xl hover:bg-gray-800 transition duration-300"
             >
               Sign Up

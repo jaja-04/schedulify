@@ -18,16 +18,45 @@ const Student = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prevState) => ({
-      ...prevState,
-      [name]: value,
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Add form submission logic here
-    console.log(formData);
+    
+    // Validate passwords match
+    if (formData.password !== formData.confirmPassword) {
+      alert("Passwords do not match");
+      return;
+    }
+    
+    try {
+      // Remove confirmPassword before sending to API
+      const { confirmPassword, ...dataToSubmit } = formData;
+      
+      const response = await fetch('http://localhost:4000/api/student/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(dataToSubmit),
+      });
+
+      const data = await response.json();
+      
+      if (response.ok) {
+        alert('Registration successful!');
+        navigate('/student-login'); // Redirect to login
+      } else {
+        alert(data.message || 'Registration failed. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error during registration:', error);
+      alert('Network error. Please try again later.');
+    }
   };
 
   return (
