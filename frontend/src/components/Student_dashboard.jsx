@@ -12,7 +12,6 @@ const Student_dashboard = () => {
   const menuItems = [
     { icon: Home, label: "Dashboard" },
     { icon: List, label: "My Schedule" },
-
     { icon: HelpCircle, label: "Help" },
   ];
 
@@ -44,6 +43,11 @@ const Student_dashboard = () => {
 
   const [isAccountModalOpen, setIsAccountModalOpen] = useState(false);
   
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    // Optionally, add code to handle session logout or cleanup
+  };
+
   return (
     <div className="flex h-screen bg-gray-900 text-white">
       {/* Sidebar */}
@@ -84,6 +88,15 @@ const Student_dashboard = () => {
         >
           <User className="mr-3 w-5 h-5" />
           <span className="text-sm">Account</span>
+        </div>
+
+        {/* Logout Button */}
+        <div 
+          className="flex items-center p-3 rounded-lg cursor-pointer hover:bg-gray-700 text-gray-300"
+          onClick={handleLogout}
+        >
+          <LogOut className="mr-3 w-5 h-5" />
+          <span className="text-sm">Logout</span>
         </div>
       </div>
 
@@ -128,14 +141,6 @@ const Student_dashboard = () => {
         {/* My Schedule */}
         {selectedMenu === "My Schedule" && (
           <CourseSchedule courses={courses} />
-        )}
-
-        {/* Manage Courses */}
-        {selectedMenu === "Manage Courses" && (
-          <ManageCourses 
-            courses={courses} 
-            setCourses={setCourses} 
-          />
         )}
 
         {/* Help */}

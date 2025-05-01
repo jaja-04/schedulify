@@ -23,6 +23,13 @@ const Admin_dashboard = () => {
   // ─── account modal/login state ───────────────────
   const [isAccountModalOpen, setIsAccountModalOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(true);
+  
+  // ─── logout handler ───────────────────────────────
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    window.location.href = "/login"; // Redirect to login page
+  };
+  
 
   // ─── mock courses with room + professor ──────────
   const [courses] = useState([
@@ -62,6 +69,12 @@ const Admin_dashboard = () => {
     },
     { icon: HelpCircle, label: "Help" },
   ];
+
+  // ───────────────────────────────────────────────────────────────────
+  if (!isLoggedIn) {
+    window.location.href = "/login";
+    return null;
+  }
 
   // ───────────────────────────────────────────────────────────────────
   return (
@@ -139,6 +152,14 @@ const Admin_dashboard = () => {
         >
           <User className="mr-3 w-5 h-5" />
           <span className="text-sm">Account</span>
+        </div>
+
+        {/* LOGOUT BUTTON */}
+        <div
+          className="flex items-center p-3 rounded-lg cursor-pointer hover:bg-red-700 text-gray-300 mt-4"
+          onClick={handleLogout}
+        >
+          <span className="text-sm">Logout</span>
         </div>
       </div>
 
