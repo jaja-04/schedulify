@@ -116,20 +116,11 @@ const Student_login = () => {
 
             <button
               type="submit"
+              onClick={() => navigate("/student-dashboard")}
               className="w-full cursor-pointer bg-black text-white py-2 rounded-3xl hover:bg-gray-800 transition duration-300"
             >
               Login
             </button>
-
-            <div className="text-center mt-4 text-gray-600">
-              Don't have an account?
-              <Link
-                  to="/student-register"
-                  className="text-[#db6d00] cursor-pointer ml-1 hover:underline"
-                >
-                  Register
-                </Link>
-            </div>
           </form>
         </div>
       </div>

@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { Home, List, Layers, User, HelpCircle, LogOut } from "lucide-react";
 
 import CourseSchedule from "./Student_schedule";
-import ManageCourses from "./Student_ManageCourses";
 import HelpSection from "./Student_help";
 import AccountModal from "./Student_account";
 
@@ -13,7 +12,7 @@ const Student_dashboard = () => {
   const menuItems = [
     { icon: Home, label: "Dashboard" },
     { icon: List, label: "My Schedule" },
-    { icon: Layers, label: "Manage Courses" },
+
     { icon: HelpCircle, label: "Help" },
   ];
 
