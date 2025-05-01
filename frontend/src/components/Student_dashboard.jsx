@@ -142,7 +142,15 @@ const Student_dashboard = () => {
         {selectedMenu === "My Schedule" && (
           <CourseSchedule courses={courses} />
         )}
-
+        
+        {/* Manage Courses */}
+        {selectedMenu === "Manage Courses" && (
+          <ManageCourses 
+            courses={courses} 
+            setCourses={setCourses} 
+          />
+        )}
+        
         {/* Help */}
         {selectedMenu === "Help" && (
           <HelpSection />
