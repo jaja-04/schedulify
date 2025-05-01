@@ -1,10 +1,14 @@
 import express from 'express';
+import verifyUser from '../middleware/authMiddleware.js';
 import { getSchedule, generateSchedule } from '../controllers/scheduleController.js';
-import authMiddleware from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
-router.get('/:userId', authMiddleware, getSchedule); // for student/faculty
-router.post('/generate', authMiddleware, generateSchedule); // for admin
+// Get schedule - accessible by student, faculty, and admin
+router.get('/', getSchedule);
+
+// Generate schedule - admin only
+router.post('/generate', generateSchedule);
 
 export default router;
+ 
