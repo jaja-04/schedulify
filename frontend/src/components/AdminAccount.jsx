@@ -56,7 +56,7 @@ const Admin_account = ({ isOpen, onClose, isLoggedIn, setIsLoggedIn }) => {
                 logout(); // from context
                 setIsLogoutModalOpen(false);
                 onClose();
-                navigate('/rolebase-register');
+                navigate('/');
               }}              
               className="px-4 py-2 bg-red-600 rounded hover:bg-red-700"
             >

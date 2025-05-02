@@ -1,6 +1,6 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { AuthProvider } from "./path/to/authContext"; // Import your AuthProvider
+import { AuthProvider } from "./context/authContext"; // Import your AuthProvider
 import Landing from "./pages/Landing";
 import Student from "./components/Student";
 import Faculty from "./components/Faculty";

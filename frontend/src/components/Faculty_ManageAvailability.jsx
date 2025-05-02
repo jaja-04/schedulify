@@ -1,70 +1,67 @@
 import React, { useState } from "react";
 
-const Faculty_ManageAvailability = ({ onSave }) => {
-  const [preferredDays, setPreferredDays] = useState("");
-  const [dayOffs, setDayOffs] = useState("");
+const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
-  // Save availability
-  const handleSave = () => {
-    if (!preferredDays || !dayOffs) return;
+const Faculty_ManageAvailability = ({ userId }) => {
+  const [selectedDays, setSelectedDays] = useState([]);
 
-    onSave(preferredDays, dayOffs); // Pass data back to the parent component
+  const toggleDay = (day) => {
+    setSelectedDays((prev) =>
+      prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day]
+    );
+  };
 
-    // Reset fields after saving
-    setPreferredDays("");
-    setDayOffs("");
+  const handleSave = async () => {
+    if (selectedDays.length === 0 || !userId) return;
+
+    try {
+      for (const day of selectedDays) {
+        await fetch("http://localhost:5000/api/requests", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include", // if you're using cookies
+          body: JSON.stringify({
+            selectedDate: day, // might want to use actual date instead
+            userId
+          }),
+        });
+      }
+
+      alert("Day-off requests submitted!");
+      setSelectedDays([]);
+    } catch (error) {
+      console.error("Error submitting request:", error);
+    }
   };
 
   return (
     <div className="p-6 space-y-6">
       <h1 className="text-3xl font-bold text-white">Availability</h1>
 
-      {/* Preferred Working Days/Times */}
       <div className="bg-gray-800 p-4 rounded-lg">
-        <label className="block text-sm text-gray-400 mb-2">Preferred Working Days/Times</label>
-        <select
-          value={preferredDays}
-          onChange={(e) => setPreferredDays(e.target.value)}
-          className="w-full p-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
-        >
-          <option value="">Select Preferred Working Days/Times</option>
-          <option value="monday">Sunday</option>
-          <option value="monday">Monday</option>
-          <option value="tuesday">Tuesday</option>
-          <option value="wednesday">Wednesday</option>
-          <option value="thursday">Thursday</option>
-          <option value="friday">Friday</option>
-          <option value="monday">Saturday</option>
-        </select>
+        <label className="block text-sm text-gray-400 mb-4">Select Your Day-off</label>
+        <div className="grid grid-cols-2 gap-2 text-white">
+          {daysOfWeek.map((day) => (
+            <label key={day} className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                checked={selectedDays.includes(day)}
+                onChange={() => toggleDay(day)}
+                className="form-checkbox text-blue-500"
+              />
+              <span>{day}</span>
+            </label>
+          ))}
+        </div>
       </div>
 
-      {/* Day-offs and Unavailable Slots */}
-      <div className="bg-gray-800 p-4 rounded-lg">
-        <label className="block text-sm text-gray-400 mb-2">Day-offs and Unavailable Slots</label>
-        <select
-          value={dayOffs}
-          onChange={(e) => setDayOffs(e.target.value)}
-          className="w-full p-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
-        >
-          <option value="">Select Day-offs and Unavailable Slots</option>
-          <option value="monday">Sunday</option>
-          <option value="monday">Monday</option>
-          <option value="tuesday">Tuesday</option>
-          <option value="wednesday">Wednesday</option>
-          <option value="thursday">Thursday</option>
-          <option value="friday">Friday</option>
-          <option value="monday">Saturday</option>
-        </select>
-      </div>
-
-      {/* Save Availability */}
       <div className="flex justify-center mt-4">
-        <div
+        <button
           onClick={handleSave}
-          className="px-4 py-2 bg-blue-600 rounded-lg hover:bg-blue-700 text-white cursor-pointer"
+          className="px-4 py-2 bg-blue-600 rounded-lg hover:bg-blue-700 text-white"
         >
           Save Availability
-        </div>
+        </button>
       </div>
     </div>
   );

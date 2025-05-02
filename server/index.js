@@ -6,12 +6,18 @@ import scheduleRouter from "./routes/schedule.js";
 import requestsRouter from "./routes/requests.js";
 import Student from "./models/Student.js";
 import User from "./models/User.js";
+import DayOffRequest from "./models/DayOffRequest.js";  // Import DayOffRequest model
 import sequelize from "./db/db.js";
 
 dotenv.config(); 
 
-// Connect to MySQL database
-sequelize.sync({ alter: true }) 
+// Define associations between User and DayOffRequest
+User.hasMany(DayOffRequest, { foreignKey: 'userId', as: 'dayOffRequests' });
+DayOffRequest.belongsTo(User, { foreignKey: 'userId', as: 'requester' });
+
+
+// Connect to MySQL database and sync models
+sequelize.sync({ alter: true, logging: console.log }) 
   .then(() => console.log("MySQL Database Synced"))
   .catch((err) => console.error("MySQL Connection Error:", err));
 

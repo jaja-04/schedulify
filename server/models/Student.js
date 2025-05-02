@@ -44,8 +44,7 @@ const Student = sequelize.define('Student', {
   timestamps: true
 });
 
-// Define the association
-Student.belongsTo(User, { foreignKey: 'userId' });
-User.hasOne(Student, { foreignKey: 'userId' });
+Student.belongsTo(User, { foreignKey: 'userId', as: 'account' });
+User.hasOne(Student, { foreignKey: 'userId', as: 'studentProfile' });
 
 export default Student;
