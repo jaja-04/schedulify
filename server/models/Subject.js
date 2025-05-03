@@ -1,7 +1,7 @@
 import { DataTypes } from 'sequelize';
 import sequelize from '../db/db.js';
 
-const Student = sequelize.define('Student', {
+const Subject = sequelize.define('Subject', {
   id: {
     type: DataTypes.INTEGER,
     autoIncrement: true,
@@ -11,22 +11,7 @@ const Student = sequelize.define('Student', {
     type: DataTypes.STRING,
     allowNull: false
   },
-  section: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    validate: {
-      isIn: [['3201', '3202', '3203', '3204', '3205']]
-    }
-  },
-  userId: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    references: {
-      model: 'users',  // Use table name string
-      key: 'id'
-    }
-  },
-  yearLevel: {
+  subjects: {
     type: DataTypes.STRING,
     allowNull: false
   },
@@ -39,8 +24,8 @@ const Student = sequelize.define('Student', {
     defaultValue: DataTypes.NOW
   }
 }, {
-  tableName: 'student',
+  tableName: 'subjects',
   timestamps: true
 });
 
-export default Student;
+export default Subject;

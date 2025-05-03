@@ -37,7 +37,7 @@ const Student = () => {
       // Remove confirmPassword before sending to API
       const { confirmPassword, ...dataToSubmit } = formData;
       
-      const response = await fetch('http://localhost:4000/api/student/signup', {
+      const response = await fetch('http://localhost:5173/api/student/signup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

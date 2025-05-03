@@ -1,13 +1,17 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { LogOut, Mail, IdCard, Book, Calendar, Edit, Settings } from "lucide-react";
 // Make sure these import paths are correct - adjust if your files are in different folders
 import Edit_Profile_Modal from "./Edit_Profile_Modal.jsx";
 import Settings_Modal from "./Settings_Modal.jsx";
+import { useAuth } from "../context/authContext.jsx";
 
 const Student_account = ({ isOpen, onClose, isLoggedIn, setIsLoggedIn }) => {
+  const navigate = useNavigate();
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   const [isEdit_Profile_Modal, setisEdit_Profile_Modal] = useState(false);
   const [isSettings_Modal, setisSettings_Modal] = useState(false);
+  const { logout } = useAuth();
   
   // Student profile data
   const [profileData, setProfileData] = useState({
@@ -48,9 +52,10 @@ const Student_account = ({ isOpen, onClose, isLoggedIn, setIsLoggedIn }) => {
             </button>
             <button 
               onClick={() => {
-                setIsLoggedIn(false);
+                logout(); // from context
                 setIsLogoutModalOpen(false);
                 onClose();
+                navigate('/');
               }}
               className="px-4 py-2 bg-red-600 rounded hover:bg-red-700"
             >
