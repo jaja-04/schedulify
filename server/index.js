@@ -20,7 +20,7 @@ User.hasOne(Student, { foreignKey: 'userId', as: 'studentProfile' });
 Student.belongsTo(User, { foreignKey: 'userId', as: 'account' });
 
 // Connect to MySQL database and sync models
-sequelize.sync({ alter: true, logging: console.log }) 
+sequelize.sync({ alter: true}) 
   .then(() => console.log("MySQL Database Synced"))
   .catch((err) => console.error("MySQL Connection Error:", err));
 
@@ -29,23 +29,27 @@ const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors({
-  origin: 'http://localhost:5173',
-  credentials: true
+  origin: 'http://localhost:5173', // Change this as needed
+  credentials: true, // Allow credentials
+  allowedHeaders: ['Content-Type', 'Authorization'], // Allow the 'Authorization' header
 }));
+
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-// API Routes
-app.use("/api/auth", authRouter);
-app.use("/api/schedule", scheduleRouter);
-app.use("/api/requests", requestsRouter);
 
 // Logger Middleware
 app.use((req, res, next) => {
   console.log(`${req.method} ${req.path}`);
   next();
 });
+
+// API Routes
+app.use("/api/auth", authRouter);
+app.use("/api/schedule", scheduleRouter);
+app.use("/api/requests", requestsRouter);
+
+
 
 // Start the server
 app.listen(PORT, () => {
