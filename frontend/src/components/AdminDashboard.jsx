@@ -209,6 +209,15 @@ const Admin_dashboard = () => {
     { icon: HelpCircle, label: "Help" },
   ];
 
+  // Function to handle year level selection
+  const handleYearLevelClick = (yearLevel) => {
+    setSelectedMenu(yearLevel);
+    // Do NOT close the dropdown menu
+    // Keep expandedMenu as "Year Level"
+    setSelectedCourse(null);
+    setSelectedBlock(blocks[yearLevel][0]); // reset to the first block
+  };
+
   // ───────────────────────────────────────────────────────────────────
   return (
     <div className="flex h-screen bg-[#0F172A] text-white">
@@ -270,12 +279,7 @@ const Admin_dashboard = () => {
                             ? "bg-blue-600 text-white"
                             : "text-gray-400 hover:bg-gray-700"
                         }`}
-                      onClick={() => {
-                        setSelectedMenu(sub);
-                        setExpandedMenu(null);
-                        setSelectedCourse(null);
-                        setSelectedBlock(blocks[sub][0]); // reset to the first block
-                      }}
+                      onClick={() => handleYearLevelClick(sub)}
                     >
                       {sub}
                     </div>
