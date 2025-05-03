@@ -1,6 +1,5 @@
 import { DataTypes } from 'sequelize';
 import sequelize from '../db/db.js';
-import User from './User.js'; // Import User model
 
 const Student = sequelize.define('Student', {
   id: {
@@ -23,14 +22,14 @@ const Student = sequelize.define('Student', {
     type: DataTypes.INTEGER,
     allowNull: false,
     references: {
-      model: User,
+      model: 'users',  // Use table name string
       key: 'id'
     }
   },
   yearLevel: {
     type: DataTypes.STRING,
     allowNull: false
-},
+  },
   createdAt: {
     type: DataTypes.DATE,
     defaultValue: DataTypes.NOW
@@ -43,8 +42,5 @@ const Student = sequelize.define('Student', {
   tableName: 'student',
   timestamps: true
 });
-
-Student.belongsTo(User, { foreignKey: 'userId', as: 'account' });
-User.hasOne(Student, { foreignKey: 'userId', as: 'studentProfile' });
 
 export default Student;

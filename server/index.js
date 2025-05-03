@@ -9,12 +9,15 @@ import User from "./models/User.js";
 import DayOffRequest from "./models/DayOffRequest.js";  // Import DayOffRequest model
 import sequelize from "./db/db.js";
 
+
 dotenv.config(); 
 
-// Define associations between User and DayOffRequest
+// Associations
 User.hasMany(DayOffRequest, { foreignKey: 'userId', as: 'dayOffRequests' });
 DayOffRequest.belongsTo(User, { foreignKey: 'userId', as: 'requester' });
 
+User.hasOne(Student, { foreignKey: 'userId', as: 'studentProfile' });
+Student.belongsTo(User, { foreignKey: 'userId', as: 'account' });
 
 // Connect to MySQL database and sync models
 sequelize.sync({ alter: true, logging: console.log }) 
