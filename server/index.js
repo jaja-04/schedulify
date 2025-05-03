@@ -6,34 +6,21 @@ import scheduleRouter from "./routes/schedule.js";
 import requestsRouter from "./routes/requests.js";
 import Student from "./models/Student.js";
 import User from "./models/User.js";
-import DayOffRequest from "./models/DayOffRequest.js";  // Import DayOffRequest model
+import DayOffRequest from "./models/DayOffRequest.js";
 import sequelize from "./db/db.js";
+import Course from "./models/Course.js";
 
-
-dotenv.config(); 
-
-// Associations
-User.hasMany(DayOffRequest, { foreignKey: 'userId', as: 'dayOffRequests' });
-DayOffRequest.belongsTo(User, { foreignKey: 'userId', as: 'requester' });
-
-User.hasOne(Student, { foreignKey: 'userId', as: 'studentProfile' });
-Student.belongsTo(User, { foreignKey: 'userId', as: 'account' });
-
-// Connect to MySQL database and sync models
-sequelize.sync({ alter: true}) 
-  .then(() => console.log("MySQL Database Synced"))
-  .catch((err) => console.error("MySQL Connection Error:", err));
+dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors({
-  origin: 'http://localhost:5173', // Change this as needed
-  credentials: true, // Allow credentials
-  allowedHeaders: ['Content-Type', 'Authorization'], // Allow the 'Authorization' header
+  origin: 'http://localhost:5173',
+  credentials: true,
+  allowedHeaders: ['Content-Type', 'Authorization'],
 }));
-
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -49,9 +36,60 @@ app.use("/api/auth", authRouter);
 app.use("/api/schedule", scheduleRouter);
 app.use("/api/requests", requestsRouter);
 
+// Main startup logic inside an async function
+(async () => {
+  try {
+    // Associations
+    User.hasMany(DayOffRequest, { foreignKey: 'userId', as: 'dayOffRequests' });
+    DayOffRequest.belongsTo(User, { foreignKey: 'userId', as: 'requester' });
 
+    User.hasOne(Student, { foreignKey: 'userId', as: 'studentProfile' });
+    Student.belongsTo(User, { foreignKey: 'userId', as: 'account' });
 
-// Start the server
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+    User.belongsToMany(Course, {
+      through: 'FacultyCourse',
+      foreignKey: 'facultyId',
+      otherKey: 'courseId', // 👈 This is the key addition
+      as: 'teachingCourses'
+    });
+    
+    Course.belongsToMany(User, {
+      through: 'FacultyCourse',
+      foreignKey: 'courseId',
+      otherKey: 'facultyId', // 👈 Mirror it here
+      as: 'assignedFaculty'
+    });
+    
+
+    // Force model recognition before syncing
+    await sequelize.sync({ alter: true });
+
+    // Seed data  
+    const courseData = [
+      { courseId: "CpEE 402", courseName: "Cognate / Elective Course 2", units: 3 },
+      { courseId: "CpE 420", courseName: "Digital Signal Processing", units: 4 },
+      { courseId: "CpE 422", courseName: "CpE Practice and Design 1", units: 1 },
+      { courseId: "CpE 417", courseName: "Microprocessors", units: 4 },
+      { courseId: "CpE 421", courseName: "Emerging Technologies in CpE", units: 3 },
+      { courseId: "CpE 419", courseName: "Routing and Switching (Cisco 2)", units: 1 },
+      { courseId: "CpE 418", courseName: "Software Design", units: 4 },
+    ];
+
+    for (const course of courseData) {
+      await Course.findOrCreate({
+        where: { courseId: course.courseId },
+        defaults: course
+      });
+    }
+
+    console.log("Courses added or already exist.");
+
+    // Start server only after DB is ready
+    app.listen(PORT, () => {
+      console.log(`Server is running on port ${PORT}`);
+    });
+
+  } catch (err) {
+    console.error("Startup Error:", err);
+  }
+})();
