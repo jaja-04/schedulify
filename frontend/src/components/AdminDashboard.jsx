@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { PanelLeftOpen, User, HelpCircle } from "lucide-react";
 import HelpSection from "./AdminHelp";
 import AccountModal from "./AdminAccount";
+import AdminRequest from "./AdminRequest";
 
 const Admin_dashboard = () => {
   // ─── top‑level menu state ──────────────────────────
@@ -207,6 +208,7 @@ const Admin_dashboard = () => {
       subItems: ["1st Year", "2nd Year", "3rd Year", "4th Year"],
     },
     { icon: HelpCircle, label: "Help" },
+    { icon: HelpCircle, label: "DayoffRequest" },
   ];
 
   // Function to handle year level selection
@@ -362,6 +364,9 @@ const Admin_dashboard = () => {
 
       {/* HELP SECTION */}
       {selectedMenu === "Help" && <HelpSection />}
+
+      {/* HELP SECTION */}
+      {selectedMenu === "DayoffRequest" && <AdminRequest />}
 
       {/* ACCOUNT MODAL */}
       <AccountModal
