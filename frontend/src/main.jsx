@@ -4,11 +4,14 @@ import './index.css'
 import App from './App.jsx'
 
 import AuthContext from './context/authContext.jsx'
+import { AuthProvider } from './context/authContext.jsx';
+
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <AuthContext> 
+    <AuthProvider>
       <App />
-    </AuthContext>
-</StrictMode>
-)
+    </AuthProvider>
+  </StrictMode>
+);
+
