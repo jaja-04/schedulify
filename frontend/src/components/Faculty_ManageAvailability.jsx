@@ -118,7 +118,7 @@ const Faculty_ManageAvailability = ({ userId }) => {
             disabled={loading || !!currentRequest}
           >
             Submit Request
-          </button>z
+          </button>
         </div>
 
         {loading ? (

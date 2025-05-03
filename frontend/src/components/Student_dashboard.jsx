@@ -18,42 +18,41 @@ const Student_dashboard = () => {
 
   // Mock data for courses
   const [courses, setCourses] = useState([
-    { 
-      id: 1, 
-      name: "Introduction to Computer Science", 
-      instructor: "Dr. Jane Smith", 
-      time: "Mon/Wed 10:00 AM", 
+    {
+      id: 1,
+      name: "Introduction to Computer Science",
+      instructor: "Dr. Jane Smith",
+      time: "Mon/Wed 10:00 AM",
       room: "Tech Building 305",
       credits: 3,
       block: "A",
       yearLevel: 1,
-      conflicts: "None"
+      conflicts: "None",
     },
-    { 
-      id: 2, 
-      name: "Data Structures", 
-      instructor: "Prof. John Doe", 
-      time: "Tue/Thu 2:00 PM", 
+    {
+      id: 2,
+      name: "Data Structures",
+      instructor: "Prof. John Doe",
+      time: "Tue/Thu 2:00 PM",
       room: "Science Hall 202",
       credits: 4,
-      block: "B", 
+      block: "B",
       yearLevel: 2,
-      conflicts: "None"
-    }
+      conflicts: "None",
+    },
   ]);
 
   const [isAccountModalOpen, setIsAccountModalOpen] = useState(false);
-  
+
   return (
     <div className="flex h-screen bg-gray-900 text-white">
       {/* Sidebar */}
       <div className="w-64 bg-gray-800 p-4 border-r border-gray-700 flex flex-col">
         <div className="flex items-center mb-8">
-          <img 
-            src="/api/placeholder/40/40" 
-            alt="Student Icon" 
-            className="w-10 h-10 mr-3 rounded-lg"
-          />
+          <div className="w-10 h-10 mr-3 rounded-lg bg-blue-600 text-white flex items-center justify-center font-bold">
+            S
+          </div>
+
           <div>
             <h2 className="font-semibold">Student</h2>
             <p className="text-xs text-gray-400">Computer Engineering</p>
@@ -62,13 +61,15 @@ const Student_dashboard = () => {
 
         <nav className="flex-1">
           {menuItems.map((item) => (
-            <div 
+            <div
               key={item.label}
               className={`
                 flex items-center p-3 rounded-lg cursor-pointer mb-2
-                ${selectedMenu === item.label 
-                  ? 'bg-blue-600 text-white' 
-                  : 'hover:bg-gray-700 text-gray-300'}
+                ${
+                  selectedMenu === item.label
+                    ? "bg-blue-600 text-white"
+                    : "hover:bg-gray-700 text-gray-300"
+                }
               `}
               onClick={() => setSelectedMenu(item.label)}
             >
@@ -78,7 +79,7 @@ const Student_dashboard = () => {
           ))}
         </nav>
 
-        <div 
+        <div
           className="flex items-center p-3 rounded-lg cursor-pointer hover:bg-gray-700 text-gray-300"
           onClick={() => setIsAccountModalOpen(true)}
         >
@@ -126,28 +127,21 @@ const Student_dashboard = () => {
         )}
 
         {/* My Schedule */}
-        {selectedMenu === "My Schedule" && (
-          <CourseSchedule courses={courses} />
-        )}
+        {selectedMenu === "My Schedule" && <CourseSchedule courses={courses} />}
 
         {/* Manage Courses */}
         {selectedMenu === "Manage Courses" && (
-          <ManageCourses 
-            courses={courses} 
-            setCourses={setCourses} 
-          />
+          <ManageCourses courses={courses} setCourses={setCourses} />
         )}
 
         {/* Help */}
-        {selectedMenu === "Help" && (
-          <HelpSection />
-        )}
+        {selectedMenu === "Help" && <HelpSection />}
       </div>
 
       {/* Account Modal */}
-      <AccountModal 
-        isOpen={isAccountModalOpen} 
-        onClose={() => setIsAccountModalOpen(false)} 
+      <AccountModal
+        isOpen={isAccountModalOpen}
+        onClose={() => setIsAccountModalOpen(false)}
         isLoggedIn={isLoggedIn}
         setIsLoggedIn={setIsLoggedIn}
       />
