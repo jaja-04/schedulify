@@ -15,7 +15,7 @@ const Student_login = () => {
     console.log("Login attempted with:", { email, password });
 
     try {
-      const response = await fetch('http://localhost:4000/api/student/login', {
+      const response = await fetch('http://localhost:5000/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
