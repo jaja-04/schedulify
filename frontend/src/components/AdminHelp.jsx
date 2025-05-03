@@ -29,9 +29,12 @@ const AdminHelp = () => {
 
   return (
     <div className="p-6">
+      {/* Updated header section - removing the "He" text */}
       <div className="flex items-center mb-6">
-        <HelpCircle className="mr-4 w-10 h-10 text-blue-500" />
-        <h1 className="text-2xl font-bold">Admin Help Center</h1>
+        <div className="flex items-center">
+          <HelpCircle className="mr-4 w-10 h-10 text-blue-500" />
+          <h1 className="text-2xl font-bold">Admin Help Center</h1>
+        </div>
       </div>
 
       <div className="grid md:grid-cols-2 gap-6">
