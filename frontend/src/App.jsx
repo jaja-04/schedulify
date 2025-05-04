@@ -22,6 +22,8 @@ import Faculty_ManageAvailability from "./components/Faculty_ManageAvailability"
 import AdminDashboard from "./components/AdminDashboard";
 import Admin_ManageSchedule from "./components/Admin_ManageSchedule";
 import Login from "./components/sign-in/Login";
+import Admin_GenerateSchedule from "./components/Admin_GenerateSchedule";
+import Admin_ScheduleViewer from './components/Admin_ScheduleViewer';
 
 const App = () => {
   return (
@@ -49,6 +51,8 @@ const App = () => {
           <Route path="/manage-availability" element={<Faculty_ManageAvailability />} />
           <Route path="/admin-dashboard" element={<AdminDashboard />} />
           <Route path="/admin-manage-schedule" element={<Admin_ManageSchedule />} />
+          <Route path="/admin-generate" element={<Admin_GenerateSchedule />} />
+          <Route path="/admin/view-schedule" element={<Admin_ScheduleViewer />} />
         </Routes>
       </AuthProvider>
     </Router>
