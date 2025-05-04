@@ -47,4 +47,28 @@ export const generateSchedule = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+exports.getScheduleByProfessor = async (req, res) => {
+  const { professorId } = req.params;
+  try {
+    const schedule = await Schedule.find({ professor: professorId })
+      .populate('subject classroom section');
+    res.json(schedule);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to get professor schedule' });
+  }
+};
+
+// For student schedule (based on their section)
+exports.getScheduleByStudent = async (req, res) => {
+  const { studentId } = req.params;
+  try {
+    const student = await Student.findById(studentId);
+    const schedule = await Schedule.find({ section: student.section })
+      .populate('subject classroom professor');
+    res.json(schedule);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to get student schedule' });
+  }
+};
     
