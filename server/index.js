@@ -6,34 +6,22 @@ import scheduleRouter from "./routes/schedule.js";
 import requestsRouter from "./routes/requests.js";
 import Student from "./models/Student.js";
 import User from "./models/User.js";
-import DayOffRequest from "./models/DayOffRequest.js";  // Import DayOffRequest model
+import DayOffRequest from "./models/DayOffRequest.js";
 import sequelize from "./db/db.js";
+import Course from "./models/Course.js";
+import FacultyCourse from "./models/FacultyCourse.js";
 
-
-dotenv.config(); 
-
-// Associations
-User.hasMany(DayOffRequest, { foreignKey: 'userId', as: 'dayOffRequests' });
-DayOffRequest.belongsTo(User, { foreignKey: 'userId', as: 'requester' });
-
-User.hasOne(Student, { foreignKey: 'userId', as: 'studentProfile' });
-Student.belongsTo(User, { foreignKey: 'userId', as: 'account' });
-
-// Connect to MySQL database and sync models
-sequelize.sync({ alter: true}) 
-  .then(() => console.log("MySQL Database Synced"))
-  .catch((err) => console.error("MySQL Connection Error:", err));
+dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors({
-  origin: 'http://localhost:5173', // Change this as needed
-  credentials: true, // Allow credentials
-  allowedHeaders: ['Content-Type', 'Authorization'], // Allow the 'Authorization' header
+  origin: 'http://localhost:5173',
+  credentials: true,
+  allowedHeaders: ['Content-Type', 'Authorization'],
 }));
-
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -49,9 +37,115 @@ app.use("/api/auth", authRouter);
 app.use("/api/schedule", scheduleRouter);
 app.use("/api/requests", requestsRouter);
 
+// Main startup logic inside an async function
+(async () => {
+  try {
+    // Associations
+    User.hasMany(DayOffRequest, { foreignKey: 'userId', as: 'dayOffRequests' });
+    DayOffRequest.belongsTo(User, { foreignKey: 'userId', as: 'requester' });
 
+    User.hasOne(Student, { foreignKey: 'userId', as: 'studentProfile' });
+    Student.belongsTo(User, { foreignKey: 'userId', as: 'account' });
 
-// Start the server
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+    User.belongsToMany(Course, {
+      through: FacultyCourse,
+      foreignKey: 'facultyId',
+      otherKey: 'courseId',
+      as: 'teachingCourses',
+    });
+
+    Course.belongsToMany(User, {
+      through: FacultyCourse,
+      foreignKey: 'courseId',
+      otherKey: 'facultyId',
+      as: 'assignedFaculty',
+    });
+
+    // Sync DB
+    await sequelize.sync({ alter: true });
+
+    // Seed Courses
+    const courseData = [
+      { courseId: "CpEE 402", courseName: "Cognate / Elective Course 2", units: 3 },
+      { courseId: "CpE 420", courseName: "Digital Signal Processing", units: 4 },
+      { courseId: "CpE 422", courseName: "CpE Practice and Design 1", units: 1 },
+      { courseId: "CpE 417", courseName: "Microprocessors", units: 4 },
+      { courseId: "CpE 421", courseName: "Emerging Technologies in CpE", units: 3 },
+      { courseId: "CpE 419", courseName: "Routing and Switching (Cisco 2)", units: 1 },
+      { courseId: "CpE 418", courseName: "Software Design", units: 4 },
+    ];
+
+    for (const course of courseData) {
+      await Course.findOrCreate({
+        where: { courseId: course.courseId },
+        defaults: course
+      });
+    }
+
+    // Seed Faculty Users
+    const facultyList = [
+      { name: "Juan Karlos", email: "juankarlos@g.batstate-u.edu.ph" },
+      { name: "Maria Santos", email: "mariasantos@g.batstate-u.edu.ph" },
+      { name: "Pedro Cruz", email: "pedrocruz@g.batstate-u.edu.ph" },
+      { name: "Ana Garcia", email: "anagarcia@g.batstate-u.edu.ph" },
+      { name: "Jose Reyes", email: "josereyes@g.batstate-u.edu.ph" },
+      { name: "Teresa Lim", email: "teresalim@g.batstate-u.edu.ph" },
+      { name: "Roberto Manuel", email: "robertomanuel@g.batstate-u.edu.ph" },
+      { name: "Victoria Aquino", email: "victoriaaquino@g.batstate-u.edu.ph" },
+      { name: "Eduardo Torres", email: "eduardotorres@g.batstate-u.edu.ph" },
+      { name: "Carmen Dalisay", email: "carmendalisay@g.batstate-u.edu.ph" },
+      { name: "Antonio Bueno", email: "antoniobueno@g.batstate-u.edu.ph" },
+      { name: "Isabella Cruz", email: "isabellacruz@g.batstate-u.edu.ph" },
+      { name: "Francisco Diaz", email: "franciscodiaz@g.batstate-u.edu.ph" },
+      { name: "Rosario Esperanza", email: "rosarioesperanza@g.batstate-u.edu.ph" },
+    ];
+
+    const facultyUsers = [];
+
+    for (const faculty of facultyList) {
+      const [user] = await User.findOrCreate({
+        where: { email: faculty.email },
+        defaults: {
+          name: faculty.name,
+          email: faculty.email,
+          password: "defaultpassword", // hash this in production
+          role: "faculty",
+        },
+      });
+      facultyUsers.push(user);
+    }
+
+    // Assign 2 faculty per course
+    const courseAssignments = [
+      ["CpEE 402", [0, 1]],
+      ["CpE 420", [2, 3]],
+      ["CpE 422", [4, 5]],
+      ["CpE 417", [6, 7]],
+      ["CpE 421", [8, 9]],
+      ["CpE 419", [10, 11]],
+      ["CpE 418", [12, 13]],
+    ];
+
+    for (const [courseId, facultyIndexes] of courseAssignments) {
+      for (const index of facultyIndexes) {
+        await FacultyCourse.findOrCreate({
+          where: {
+            facultyId: facultyUsers[index].id,
+            courseId: courseId,
+          },
+        });
+      }
+    }
+
+    console.log("Courses and faculty assignments seeded.");
+
+    // Start server
+    app.listen(PORT, () => {
+      console.log(`Server is running on port ${PORT}`);
+    });
+
+  } catch (err) {
+    console.error("Startup Error:", err);
+  }
+})();
+
