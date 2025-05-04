@@ -1,23 +1,30 @@
 import express from 'express';
 import DayOffRequest from '../models/DayOffRequest.js';
 import User from '../models/User.js';
-import authMiddleware from '../middleware/authMiddleware.js'; // Ensure path is correct
+import authMiddleware from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
-// =======================
-// FACULTY: Submit a request
-// =======================
+// ===============
+// POST: Create new request (Faculty)
+// ===============
 router.post('/', authMiddleware, async (req, res) => {
+
   try {
     const { selectedDate } = req.body;
-    const userId = req.user.id; // Taken from token, not from client
+    const userId = req.user.id;
+
+    if (!selectedDate) {
+      return res.status(400).json({ error: 'selectedDate is required' });
+    }
 
     const newRequest = await DayOffRequest.create({
       selectedDate,
       userId,
-      status: 'pending'
+      status: 'pending',
     });
+
+    console.log("New request saved:", newRequest.toJSON());
 
     res.status(201).json(newRequest);
   } catch (error) {
@@ -25,27 +32,38 @@ router.post('/', authMiddleware, async (req, res) => {
   }
 });
 
-// =======================
-// FACULTY: View their own requests
-// =======================
+// ===============
+// GET: Faculty - View their own requests
+
+// Route to fetch day-off requests for the authenticated user
 router.get('/mine', authMiddleware, async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user.id;  // This will be set by the verifyUser middleware
 
     const requests = await DayOffRequest.findAll({
       where: { userId },
-      order: [['createdAt', 'DESC']]
+      include: {
+        model: User,
+        as: 'userRequester', // Change the alias here to match the one used in the model
+        attributes: ['name'],  // Include the 'name' field of the user
+      },
+      order: [['createdAt', 'DESC']],
     });
 
-    res.json(requests);
+    res.json(requests);  // Return the requests with the user's name included
   } catch (error) {
+    console.error("Failed to fetch day-off requests:", error);
     res.status(500).json({ error: 'Failed to fetch your requests', details: error.message });
   }
 });
 
-// =======================
-// ADMIN: View all requests
-// =======================
+
+
+
+
+// ===============
+// GET: Admin - View all requests
+// ===============
 router.get('/', authMiddleware, async (req, res) => {
   try {
     if (req.user.role !== 'admin') {
@@ -56,9 +74,9 @@ router.get('/', authMiddleware, async (req, res) => {
       include: {
         model: User,
         as: 'requester',
-        attributes: ['id', 'name', 'role']
+        attributes: ['id', 'name', 'role'],
       },
-      order: [['createdAt', 'DESC']]
+      order: [['createdAt', 'DESC']],
     });
 
     res.json(requests);
@@ -67,9 +85,10 @@ router.get('/', authMiddleware, async (req, res) => {
   }
 });
 
-// =======================
-// ADMIN: Approve or reject a request
-// =======================
+// ===============
+// PATCH: Admin - Update request status
+// ===============
+// PATCH: Admin - Update request status
 router.patch('/:id', authMiddleware, async (req, res) => {
   try {
     if (req.user.role !== 'admin') {
@@ -84,7 +103,9 @@ router.patch('/:id', authMiddleware, async (req, res) => {
     }
 
     const request = await DayOffRequest.findByPk(id);
-    if (!request) return res.status(404).json({ error: 'Request not found' });
+    if (!request) {
+      return res.status(404).json({ error: 'Request not found' });
+    }
 
     request.status = status;
     await request.save();
@@ -94,5 +115,12 @@ router.patch('/:id', authMiddleware, async (req, res) => {
     res.status(500).json({ error: 'Failed to update request', details: error.message });
   }
 });
+
+
+router.get('/test', (req, res) => {
+  console.log("Test route hit");
+  res.json({ message: "Backend is alive" });
+});
+
 
 export default router;

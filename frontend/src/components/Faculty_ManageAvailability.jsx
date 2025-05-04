@@ -4,54 +4,77 @@ const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
 
 const Faculty_ManageAvailability = ({ userId }) => {
   const [selectedDay, setSelectedDay] = useState("");
-  const [currentRequest, setCurrentRequest] = useState(null);
+  const [requests, setRequests] = useState([]);  // Store all requests
   const [loading, setLoading] = useState(true);
 
+  const token = localStorage.getItem("token");
+  console.log("Token retrieved from localStorage:", token); // Check this in console
+
   const fetchMyRequest = async () => {
-    if (!userId) return;
+    setLoading(true); // Start loading when fetching the request
+    const token = localStorage.getItem("token");
+    if (!token) {
+      console.warn("No token found in localStorage");
+      setLoading(false);
+      return;
+    }
 
     try {
-      const token = localStorage.getItem('token');
-
-      const res = await fetch(`http://localhost:5000/api/requests/mine`, {
+      const res = await fetch('http://localhost:5000/api/requests/mine', {
+        method: 'GET',
         headers: {
-          "Authorization": `Bearer ${token}`
-        }
+          'Authorization': `Bearer ${token}`,
+        },
       });
 
+      if (!res.ok) {
+        console.error("Failed to fetch data:", res.status, await res.json());
+        setLoading(false);
+        return;
+      }
+
       const data = await res.json();
-      if (res.ok && data.length > 0) {
-        setCurrentRequest(data[0]); // only allow one, so get the first/latest
-        setSelectedDay(data[0].selectedDate);
+      console.log('Fetched Data:', data);  // Log the fetched data to inspect the response
+
+      setLoading(false); // Stop loading once data is fetched
+
+      if (data.length === 0) {
+        alert("No requests found.");
       } else {
-        setCurrentRequest(null);
-        setSelectedDay("");
+        setRequests(data);  // Store all requests in state
       }
     } catch (err) {
       console.error("Failed to fetch request:", err);
-    } finally {
-      setLoading(false);
+      setLoading(false); // Stop loading in case of an error
+      alert("Error fetching data.");
     }
   };
 
   const handleSubmit = async () => {
     if (!selectedDay) return alert("Please select a day.");
-  
+
     try {
-      const token = localStorage.getItem('token'); // Ensure you store this after login
-  
+      const token = localStorage.getItem("token");
+      console.log("Submitting token:", token);
+
+      if (!token) {
+        return alert("No authentication token found.");
+      }
+
       const res = await fetch("http://localhost:5000/api/requests", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ selectedDate: selectedDay })
+        body: JSON.stringify({ selectedDate: selectedDay }),
       });
-  
+
       const data = await res.json();
-  
+      console.log("Submission response:", data);
+
       if (res.ok) {
+        setSelectedDay("");
         alert("Day-off request submitted!");
         fetchMyRequest(); // Refresh current request
       } else {
@@ -62,35 +85,10 @@ const Faculty_ManageAvailability = ({ userId }) => {
       alert("Submission error.");
     }
   };
-  
 
   useEffect(() => {
     fetchMyRequest();
   }, [userId]);
-
-  const handleSave = async () => {
-    if (!selectedDay || !userId) return;
-
-    try {
-      const response = await fetch("http://localhost:5000/api/requests", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ selectedDate: selectedDay, userId }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        alert("Day-off request submitted!");
-        fetchMyRequest(); // Refresh status
-      } else {
-        alert(data.error || "Failed to submit request.");
-      }
-    } catch (error) {
-      console.error("Error submitting request:", error);
-    }
-  };
 
   return (
     <div className="p-6 space-y-6">
@@ -98,7 +96,9 @@ const Faculty_ManageAvailability = ({ userId }) => {
 
       <div className="bg-gray-800 p-4 rounded-lg text-white space-y-4">
         <div>
-          <label className="block text-sm text-gray-400 mb-2">Select Your Day-Off</label>
+          <label className="block text-sm text-gray-400 mb-2">
+            Select Your Day-Off
+          </label>
           <select
             value={selectedDay}
             onChange={(e) => setSelectedDay(e.target.value)}
@@ -106,7 +106,9 @@ const Faculty_ManageAvailability = ({ userId }) => {
           >
             <option value="">-- Choose a Day --</option>
             {daysOfWeek.map((day) => (
-              <option key={day} value={day}>{day}</option>
+              <option key={day} value={day}>
+                {day}
+              </option>
             ))}
           </select>
         </div>
@@ -115,29 +117,42 @@ const Faculty_ManageAvailability = ({ userId }) => {
           <button
             onClick={handleSubmit}
             className="px-4 py-2 bg-blue-600 rounded-lg hover:bg-blue-700 text-white"
-            disabled={loading || !!currentRequest}
           >
             Submit Request
           </button>
         </div>
 
         {loading ? (
-          <p className="text-gray-400">Loading your request...</p>
-        ) : currentRequest ? (
-          <div className="mt-4 p-3 bg-gray-700 rounded">
-            <p><strong>Requested Day-Off:</strong> {currentRequest.selectedDate}</p>
-            <p><strong>Status:</strong> 
-              <span className={`ml-2 font-semibold ${
-                currentRequest.status === 'approved' ? 'text-green-400' :
-                currentRequest.status === 'rejected' ? 'text-red-400' :
-                'text-yellow-400'
-              }`}>
-                {currentRequest.status.toUpperCase()}
-              </span>
-            </p>
-          </div>
+          <p className="text-gray-400">Loading your requests...</p>
+        ) : requests.length === 0 ? (
+          <p className="text-gray-400">You haven't submitted any requests yet.</p>
         ) : (
-          <p className="text-gray-400">You haven't submitted a request yet.</p>
+          <div className="mt-4 space-y-4">
+            {requests.map((request) => (
+              <div key={request.id} className="p-3 bg-gray-700 rounded">
+                <p>
+                  <strong>Requester:</strong> {request.requester?.name || "Unknown"}
+                </p>
+                <p>
+                  <strong>Requested Day-Off:</strong> {request.selectedDate}
+                </p>
+                <p>
+                  <strong>Status:</strong>
+                  <span
+                    className={`ml-2 font-semibold ${
+                      request.status === "accepted"
+                        ? "text-green-400"
+                        : request.status === "rejected"
+                        ? "text-red-400"
+                        : "text-yellow-400"
+                    }`}
+                  >
+                    {request.status?.toUpperCase() || "UNKNOWN"}
+                  </span>
+                </p>
+              </div>
+            ))}
+          </div>
         )}
       </div>
     </div>
