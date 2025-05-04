@@ -13,6 +13,7 @@ import FacultyCourse from "./models/FacultyCourse.js";
 import Schedule from './models/Schedule.js';
 import Room from './models/Room.js';
 import scheduleRoutes from './routes/schedule.js';
+import courseRoutes from './routes/courseRoutes.js';
 
 
 dotenv.config();
@@ -41,6 +42,8 @@ app.use("/api/auth", authRouter);
 app.use("/api/schedule", scheduleRouter);
 app.use("/api/requests", requestsRouter);
 app.use('/api/schedule', scheduleRoutes);
+app.use("/api/courses", courseRoutes);
+
 
 // Main startup logic inside an async function
 (async () => {

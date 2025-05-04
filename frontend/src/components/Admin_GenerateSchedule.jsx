@@ -1,6 +1,5 @@
 import React, { useState } from "react";
-import Logo from "../assets/Schedulify.png";
-import bgImage from "../assets/1.png";
+import { Calendar, CheckCircle, Loader2 } from "lucide-react";
 
 const Admin_GenerateSchedule = () => {
   const [loading, setLoading] = useState(false);
@@ -30,46 +29,72 @@ const Admin_GenerateSchedule = () => {
     }
   };
 
-  console.log("admin_generate");
-
   return (
-    <div
-      style={{
-        backgroundImage: `url(${bgImage})`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        height: "100vh",
-        width: "100%",
-      }}
-    >
-      <div className="min-h-screen flex items-center justify-center relative">
-        {/* Blur background */}
-        <div className="absolute inset-0 w-full h-full bg-cover bg-center opacity-60 filter blur-sm"
-          style={{ backgroundImage: 'url("/api/placeholder/1200/800")', filter: "blur(4px)" }}
-        />
-        <div className="absolute inset-0 w-full h-full bg-white opacity-20" />
-
-        {/* Content */}
-        <div className="flex flex-col justify-center items-center z-10">
-          <img src={Logo} alt="Schedulify" className="w-115 -mt-40 mb-8" />
-          <div className="bg-gray-300/30 rounded-xl shadow-lg p-8 text-center w-[30rem]">
-            <h2 className="text-3xl font-bold text-[#0d1a29] mb-6">Generate Weekly Schedule</h2>
-            
+    <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-slate-900 to-slate-800 text-gray-100">
+      <div className="relative bg-slate-800/50 backdrop-blur-sm rounded-2xl shadow-2xl border border-slate-700/50 p-12 w-full max-w-3xl mx-4">
+        
+        {/* Logo and Branding */}
+        <div className="flex items-center justify-center mb-10">
+          <div className="bg-slate-700/70 p-4 rounded-2xl">
+            <Calendar size={40} className="text-orange-500" />
+          </div>
+          <div className="ml-4">
+            <h1 className="font-extrabold text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-orange-600">
+              SCHEDULIFY
+            </h1>
+            <p className="text-slate-400 text-sm mt-1">Your Courses, Your Time, Your Way!</p>
+          </div>
+        </div>
+        
+        {/* Main Content */}
+        <div className="space-y-10 text-center">
+          <h2 className="text-4xl font-bold tracking-tight">
+            Generate Weekly Schedule
+          </h2>
+          
+          <div className="flex justify-center">
             <button
               onClick={handleGenerate}
               disabled={loading}
-              className="bg-[#db6d00] text-white py-3 px-6 rounded-3xl w-full text-lg hover:bg-[#bf5f00] transition"
+              className={`group relative flex items-center justify-center py-4 px-8 text-lg font-semibold rounded-xl transition-all duration-300 w-full max-w-sm overflow-hidden
+                ${loading 
+                  ? "bg-slate-600 cursor-not-allowed" 
+                  : "bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 shadow-lg hover:shadow-orange-500/30"
+                }`}
             >
-              {loading ? "Generating..." : "Generate Schedule"}
+              <span className="relative flex items-center">
+                {loading ? (
+                  <>
+                    <Loader2 size={22} className="mr-2 animate-spin" />
+                    Generating...
+                  </>
+                ) : (
+                  <>
+                    Generate Schedule
+                  </>
+                )}
+              </span>
+              {!loading && <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-orange-300/20 to-transparent transform translate-x-full group-hover:translate-x-0 transition-transform duration-300"></span>}
             </button>
-
-            {status && (
-              <p className="mt-4 text-sm text-gray-800 font-medium">
-                {status}
-              </p>
-            )}
           </div>
+          
+          {status && (
+            <div className={`py-4 px-6 rounded-xl ${status.includes("failed") || status.includes("Error") ? "bg-red-500/20 text-red-200" : "bg-green-500/20 text-green-200"} flex items-center justify-center transition-all duration-500 animate-fadeIn`}>
+              <span className="mr-2">
+                {status.includes("failed") || status.includes("Error") ? (
+                  <span className="text-red-400">⚠️</span>
+                ) : (
+                  <CheckCircle size={20} className="text-green-400" />
+                )}
+              </span>
+              <p className="font-medium">{status}</p>
+            </div>
+          )}
         </div>
+        
+        {/* Decorative Elements */}
+        <div className="absolute top-0 right-0 w-40 h-40 bg-orange-500/10 rounded-full blur-3xl -z-10"></div>
+        <div className="absolute bottom-0 left-0 w-60 h-60 bg-amber-500/10 rounded-full blur-3xl -z-10"></div>
       </div>
     </div>
   );
