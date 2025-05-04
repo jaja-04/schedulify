@@ -9,6 +9,7 @@ import User from "./models/User.js";
 import DayOffRequest from "./models/DayOffRequest.js";
 import sequelize from "./db/db.js";
 import Course from "./models/Course.js";
+import FacultyCourse from "./models/FacultyCourse.js";
 
 dotenv.config();
 
@@ -47,24 +48,23 @@ app.use("/api/requests", requestsRouter);
     Student.belongsTo(User, { foreignKey: 'userId', as: 'account' });
 
     User.belongsToMany(Course, {
-      through: 'FacultyCourse',
+      through: FacultyCourse,
       foreignKey: 'facultyId',
-      otherKey: 'courseId', // 👈 This is the key addition
-      as: 'teachingCourses'
+      otherKey: 'courseId',
+      as: 'teachingCourses',
     });
-    
-    Course.belongsToMany(User, {
-      through: 'FacultyCourse',
-      foreignKey: 'courseId',
-      otherKey: 'facultyId', // 👈 Mirror it here
-      as: 'assignedFaculty'
-    });
-    
 
-    // Force model recognition before syncing
+    Course.belongsToMany(User, {
+      through: FacultyCourse,
+      foreignKey: 'courseId',
+      otherKey: 'facultyId',
+      as: 'assignedFaculty',
+    });
+
+    // Sync DB
     await sequelize.sync({ alter: true });
 
-    // Seed data  
+    // Seed Courses
     const courseData = [
       { courseId: "CpEE 402", courseName: "Cognate / Elective Course 2", units: 3 },
       { courseId: "CpE 420", courseName: "Digital Signal Processing", units: 4 },
@@ -82,9 +82,64 @@ app.use("/api/requests", requestsRouter);
       });
     }
 
-    console.log("Courses added or already exist.");
+    // Seed Faculty Users
+    const facultyList = [
+      { name: "Juan Karlos", email: "juankarlos@g.batstate-u.edu.ph" },
+      { name: "Maria Santos", email: "mariasantos@g.batstate-u.edu.ph" },
+      { name: "Pedro Cruz", email: "pedrocruz@g.batstate-u.edu.ph" },
+      { name: "Ana Garcia", email: "anagarcia@g.batstate-u.edu.ph" },
+      { name: "Jose Reyes", email: "josereyes@g.batstate-u.edu.ph" },
+      { name: "Teresa Lim", email: "teresalim@g.batstate-u.edu.ph" },
+      { name: "Roberto Manuel", email: "robertomanuel@g.batstate-u.edu.ph" },
+      { name: "Victoria Aquino", email: "victoriaaquino@g.batstate-u.edu.ph" },
+      { name: "Eduardo Torres", email: "eduardotorres@g.batstate-u.edu.ph" },
+      { name: "Carmen Dalisay", email: "carmendalisay@g.batstate-u.edu.ph" },
+      { name: "Antonio Bueno", email: "antoniobueno@g.batstate-u.edu.ph" },
+      { name: "Isabella Cruz", email: "isabellacruz@g.batstate-u.edu.ph" },
+      { name: "Francisco Diaz", email: "franciscodiaz@g.batstate-u.edu.ph" },
+      { name: "Rosario Esperanza", email: "rosarioesperanza@g.batstate-u.edu.ph" },
+    ];
 
-    // Start server only after DB is ready
+    const facultyUsers = [];
+
+    for (const faculty of facultyList) {
+      const [user] = await User.findOrCreate({
+        where: { email: faculty.email },
+        defaults: {
+          name: faculty.name,
+          email: faculty.email,
+          password: "defaultpassword", // hash this in production
+          role: "faculty",
+        },
+      });
+      facultyUsers.push(user);
+    }
+
+    // Assign 2 faculty per course
+    const courseAssignments = [
+      ["CpEE 402", [0, 1]],
+      ["CpE 420", [2, 3]],
+      ["CpE 422", [4, 5]],
+      ["CpE 417", [6, 7]],
+      ["CpE 421", [8, 9]],
+      ["CpE 419", [10, 11]],
+      ["CpE 418", [12, 13]],
+    ];
+
+    for (const [courseId, facultyIndexes] of courseAssignments) {
+      for (const index of facultyIndexes) {
+        await FacultyCourse.findOrCreate({
+          where: {
+            facultyId: facultyUsers[index].id,
+            courseId: courseId,
+          },
+        });
+      }
+    }
+
+    console.log("Courses and faculty assignments seeded.");
+
+    // Start server
     app.listen(PORT, () => {
       console.log(`Server is running on port ${PORT}`);
     });
@@ -93,3 +148,4 @@ app.use("/api/requests", requestsRouter);
     console.error("Startup Error:", err);
   }
 })();
+
