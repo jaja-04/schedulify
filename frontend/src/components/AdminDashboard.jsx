@@ -3,12 +3,17 @@ import { PanelLeftOpen, User, HelpCircle } from "lucide-react";
 import HelpSection from "./AdminHelp";
 import AccountModal from "./AdminAccount";
 import AdminRequest from "./AdminRequest";
+import { useNavigate } from 'react-router-dom';
+import { Calendar } from 'lucide-react'; // Choose an appropriate icon
+import Admin_GenerateSchedule from "./Admin_GenerateSchedule"; // adjust path if needed
+import Admin_ScheduleViewer from "./Admin_ScheduleViewer";
 
 const Admin_dashboard = () => {
   // ─── top‑level menu state ──────────────────────────
   const [selectedMenu, setSelectedMenu] = useState("1st Year");
   const [expandedMenu, setExpandedMenu] = useState("Year Level");
-
+  const navigate = useNavigate();
+  
   // ─── block tabs for each year ──────────────────────
   const blocks = {
     "1st Year": ["1201", "1202", "1203", "1204", "1205"],
@@ -24,6 +29,8 @@ const Admin_dashboard = () => {
   // ─── account modal/login state ───────────────────
   const [isAccountModalOpen, setIsAccountModalOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(true);
+
+  console.log("Logged in role:", localStorage.getItem("userRole"));
 
   // ─── mock courses with room + professor ──────────
   const [courses] = useState([
@@ -204,12 +211,15 @@ const Admin_dashboard = () => {
   const menuItems = [
     {
       icon: PanelLeftOpen,
-      label: "Year Level",
-      subItems: ["1st Year", "2nd Year", "3rd Year", "4th Year"],
+      label: 'Year Level',
+      subItems: ['1st Year', '2nd Year', '3rd Year', '4th Year'],
     },
-    { icon: HelpCircle, label: "Help" },
-    { icon: HelpCircle, label: "DayoffRequest" },
+    { icon: HelpCircle, label: 'Help' },
+    { icon: HelpCircle, label: 'DayoffRequest' },
+    { icon: Calendar, label: 'Generate Schedule' },
+    { icon: Calendar, label: 'View Schedules' }, // New menu item
   ];
+
 
   // Function to handle year level selection
   const handleYearLevelClick = (yearLevel) => {
@@ -244,27 +254,30 @@ const Admin_dashboard = () => {
                   flex items-center p-3 rounded-lg cursor-pointer mb-1
                   ${
                     selectedMenu === item.label || expandedMenu === item.label
-                      ? "bg-white text-black font-semibold"
-                      : "hover:bg-gray-700 text-gray-300"
+                      ? 'bg-white text-black font-semibold'
+                      : 'hover:bg-gray-700 text-gray-300'
                   }
                 `}
                 onClick={() => {
-                  if (item.subItems) {
-                    setExpandedMenu(
-                      expandedMenu === item.label ? null : item.label
-                    );
+                  if (item.label === 'Generate Schedule') {
+                    setSelectedMenu('Generate Schedule');
+                    setExpandedMenu(null);
+                  } else if (item.label === 'View Schedules') {
+                    setSelectedMenu('View Schedules');
+                    setExpandedMenu(null);
+                  } else if (item.subItems) {
+                    setExpandedMenu(expandedMenu === item.label ? null : item.label);
                   } else {
                     setSelectedMenu(item.label);
                     setExpandedMenu(null);
                   }
-                  setSelectedCourse(null); // clear any selected course when changing menu
                 }}
               >
                 <item.icon
                   className={`mr-3 w-5 h-5 transition-transform duration-200 ${
                     item.subItems && expandedMenu === item.label
-                      ? "rotate-90"
-                      : ""
+                      ? 'rotate-90'
+                      : ''
                   }`}
                 />
                 <span className="text-sm">{item.label}</span>
@@ -278,8 +291,8 @@ const Admin_dashboard = () => {
                       className={`text-sm p-2 pl-5 rounded-md cursor-pointer mb-1
                         ${
                           selectedMenu === sub
-                            ? "bg-blue-600 text-white"
-                            : "text-gray-400 hover:bg-gray-700"
+                            ? 'bg-blue-600 text-white'
+                            : 'text-gray-400 hover:bg-gray-700'
                         }`}
                       onClick={() => handleYearLevelClick(sub)}
                     >
@@ -367,6 +380,11 @@ const Admin_dashboard = () => {
 
       {/* HELP SECTION */}
       {selectedMenu === "DayoffRequest" && <AdminRequest />}
+
+      {/* GENERATE SCHEDULE SECTION */}
+      {selectedMenu === "Generate Schedule" && <Admin_GenerateSchedule />}
+
+      {selectedMenu === 'View Schedules' && <Admin_ScheduleViewer />}
 
       {/* ACCOUNT MODAL */}
       <AccountModal

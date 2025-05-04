@@ -10,6 +10,10 @@ import DayOffRequest from "./models/DayOffRequest.js";
 import sequelize from "./db/db.js";
 import Course from "./models/Course.js";
 import FacultyCourse from "./models/FacultyCourse.js";
+import Schedule from './models/Schedule.js';
+import Room from './models/Room.js';
+import scheduleRoutes from './routes/schedule.js';
+
 
 dotenv.config();
 
@@ -36,6 +40,7 @@ app.use((req, res, next) => {
 app.use("/api/auth", authRouter);
 app.use("/api/schedule", scheduleRouter);
 app.use("/api/requests", requestsRouter);
+app.use('/api/schedule', scheduleRoutes);
 
 // Main startup logic inside an async function
 (async () => {
@@ -63,6 +68,24 @@ app.use("/api/requests", requestsRouter);
 
     // Sync DB
     await sequelize.sync({ alter: true });
+
+    const roomData = [
+      { name: 'CICS 201' },
+      { name: 'CICS 202' },
+      { name: 'CICS 501' },
+      { name: 'CICS 502' },
+      { name: 'Cpe Lab' },
+      { name: 'Comp Lab 1' },
+    ];
+    
+    for (const room of roomData) {
+      await Room.findOrCreate({
+        where: { name: room.name },
+        defaults: room,
+      });
+    }
+    
+    console.log('Rooms added or already exist.');
 
     // Seed Courses
     const courseData = [
