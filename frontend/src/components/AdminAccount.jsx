@@ -16,10 +16,9 @@ const Admin_account = ({ isOpen, onClose, isLoggedIn, setIsLoggedIn }) => {
 
   // Admin profile data
   const [profileData, setProfileData] = useState({
-    name: "Admin Name",
+    name: "Admin",
     department: "Computer Engineering",
-    email: "admin@university.edu",
-    adminId: "ADM2024-001",
+    email: "admin@gmail.com",
     role: "System Administrator",
     joinDate: "January 2021",
     phone: "555-987-6543",
@@ -116,11 +115,6 @@ const Admin_account = ({ isOpen, onClose, isLoggedIn, setIsLoggedIn }) => {
         <div className="relative px-6 pb-6">
           {/* Profile picture */}
           <div className="absolute -top-16 left-6">
-            <img 
-              src="/api/placeholder/128/128" 
-              alt="User Profile" 
-              className="w-32 h-32 rounded-full border-4 border-gray-800 object-cover"
-            />
           </div>
           
           {/* Name and department */}
@@ -134,10 +128,6 @@ const Admin_account = ({ isOpen, onClose, isLoggedIn, setIsLoggedIn }) => {
             <div className="flex items-center">
               <Mail className="w-5 h-5 mr-3 text-gray-400" />
               <span>{profileData.email}</span>
-            </div>
-            <div className="flex items-center">
-              <IdCard className="w-5 h-5 mr-3 text-gray-400" />
-              <span>Admin ID: {profileData.adminId}</span>
             </div>
             <div className="flex items-center">
               <Book className="w-5 h-5 mr-3 text-gray-400" />
