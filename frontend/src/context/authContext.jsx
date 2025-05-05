@@ -38,8 +38,11 @@ export const AuthProvider = ({ children }) => {
     verifyUser();
   }, []);
   const login = (userData) => {
-    setUser(userData);
+    // Explicitly set all needed fields to avoid missing ones
+    const { id, name, email, role } = userData;
+    setUser({ id, name, email, role });
   };
+  
   const logout = () => {
     setUser(null);
     localStorage.removeItem("token");

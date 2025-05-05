@@ -1,15 +1,29 @@
-// models/Schedule.js
 import { DataTypes } from 'sequelize';
 import sequelize from '../db/db.js';
-import User from './User.js';
 import Course from './Course.js';
 import Room from './Room.js';
+import User from './User.js';
 
 const Schedule = sequelize.define('Schedule', {
-  id: {
+  sectionId: {
     type: DataTypes.INTEGER,
-    autoIncrement: true,
-    primaryKey: true,
+    allowNull: false,
+  },
+  courseId: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    references: {
+      model: Course,
+      key: 'courseId',
+    },
+  },
+  roomId: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: Room,
+      key: 'id',
+    },
   },
   day: {
     type: DataTypes.STRING,
@@ -23,15 +37,23 @@ const Schedule = sequelize.define('Schedule', {
     type: DataTypes.TIME,
     allowNull: false,
   },
+  facultyId: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    references: {
+      model: User,
+      key: 'id',
+    },
+  },
+  
+}, {
+  timestamps: true,
+  tableName: 'schedule',
 });
 
-User.hasMany(Schedule, { foreignKey: 'facultyId', as: 'schedules' });
-Schedule.belongsTo(User, { foreignKey: 'facultyId', as: 'faculty' });
+Schedule.belongsTo(Course, { foreignKey: 'courseId' });
+Schedule.belongsTo(Room, { foreignKey: 'roomId' });
+Schedule.belongsTo(User, { foreignKey: 'facultyId', as: 'faculty' }); // if you track faculty
 
-Course.hasMany(Schedule, { foreignKey: 'courseId', as: 'courseSchedules' });
-Schedule.belongsTo(Course, { foreignKey: 'courseId', as: 'course' });
-
-Room.hasMany(Schedule, { foreignKey: 'roomId', as: 'roomSchedules' });
-Schedule.belongsTo(Room, { foreignKey: 'roomId', as: 'room' });
 
 export default Schedule;

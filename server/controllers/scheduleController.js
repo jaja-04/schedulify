@@ -1,5 +1,8 @@
 // server/controllers/scheduleController.js
 import db from '../db/db.js';
+const Schedule = require("../models/Schedule");
+const Student = require("../models/Student");
+const User = require("../models/User");
 
 export const getSchedule = async (req, res) => {
     const { role, id } = req.user;
@@ -72,3 +75,38 @@ exports.getScheduleByStudent = async (req, res) => {
   }
 };
     
+
+
+
+exports.getAllStudentSchedules = async (req, res) => {
+  try {
+    const students = await Student.findAll({
+      include: [{ model: User, attributes: ["fullName", "email"] }],
+    });
+
+    const allSchedules = [];
+
+    for (const student of students) {
+      const schedule = await Schedule.findAll({
+        where: { section: student.section },
+        include: ["subject", "faculty", "room"],
+        order: [["day", "ASC"], ["startTime", "ASC"]],
+      });
+
+      allSchedules.push({
+        student: {
+          id: student.id,
+          name: student.User?.fullName,
+          email: student.User?.email,
+          section: student.section,
+        },
+        schedule,
+      });
+    }
+
+    res.json({ success: true, data: allSchedules });
+  } catch (err) {
+    console.error("Error fetching all student schedules:", err);
+    res.status(500).json({ success: false, error: "Server error while fetching all schedules." });
+  }
+};
