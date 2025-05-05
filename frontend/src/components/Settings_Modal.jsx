@@ -40,19 +40,7 @@ const Settings_Modal = ({ isOpen, onClose, settingsData, setSettingsData }) => {
         </div>
         
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm text-gray-400 mb-1">Theme</label>
-            <select
-              name="theme"
-              value={formData.theme}
-              onChange={handleChange}
-              className="w-full p-2 bg-gray-800 border border-gray-600 rounded"
-            >
-              <option value="dark">Dark Theme</option>
-              <option value="light">Light Theme</option>
-              <option value="system">System Default</option>
-            </select>
-          </div>
+          
           
           <div className="flex items-center">
             <input

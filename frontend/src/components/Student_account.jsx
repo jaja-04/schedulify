@@ -1,39 +1,79 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { LogOut, Mail, IdCard, Book, Calendar, Edit, Settings } from "lucide-react";
+import {
+  LogOut,
+  Mail,
+  IdCard,
+  Book,
+  Calendar,
+  Edit,
+  Settings,
+  Loader,
+} from "lucide-react";
 // Make sure these import paths are correct - adjust if your files are in different folders
 import Edit_Profile_Modal from "./Edit_Profile_Modal.jsx";
 import Settings_Modal from "./Settings_Modal.jsx";
 import { useAuth } from "../context/authContext.jsx";
+import axios from "axios";
 
 const Student_account = ({ isOpen, onClose, isLoggedIn, setIsLoggedIn }) => {
   const navigate = useNavigate();
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   const [isEdit_Profile_Modal, setisEdit_Profile_Modal] = useState(false);
   const [isSettings_Modal, setisSettings_Modal] = useState(false);
-  const { logout } = useAuth();
-  
-  // Student profile data
-  const [profileData, setProfileData] = useState({
-    name: "John Doe",
-    department: "Computer Engineering",
-    email: "john.doe@university.edu",
-    studentId: "CE2024-1234",
-    year: "Third Year Student",
-    joinDate: "September 2022",
-    phone: "555-123-4567",
-    address: "123 University Ave"
-  });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const { logout, user } = useAuth();
 
-  // Settings data
+  const [profileData, setProfileData] = useState({
+    name: "",
+    department: "",
+    email: "",
+    studentId: "",
+    year: "",
+    joinDate: "",
+  });
+  
+
+  
+  useEffect(() => {
+    // If we already have user data in the auth context, use it directly
+    if (user && isOpen) {
+      // Set a short timeout just to avoid flickering if data is available immediately
+      const timer = setTimeout(() => {
+        // Get username from name or from email if available
+        const username = user.name?.toLowerCase().replace(/\s+/g, '.') || 
+                        user.displayName?.toLowerCase().replace(/\s+/g, '.') || 
+                        user.email?.split('@')[0] || 
+                        "student";
+        
+        // Generate institutional email if not available
+        const email = user.email || `${username}@g.batstate-u.edu.ph`;
+        
+        const initialData = {
+          name: user.name || user.displayName || email.split('@')[0] || "Student Name",
+          department: user.department || "Computer Engineering",
+          email: email,
+          studentId: user.studentId || user.id || "S" + Math.floor(100000 + Math.random() * 900000),
+          year: user.year || "Third Year Student",
+          joinDate: user.joinDate || "January 2025",
+        };
+        
+        setProfileData(initialData);
+        setLoading(false);
+      }, 500);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [user, isOpen]);
+
   const [settingsData, setSettingsData] = useState({
     theme: "dark",
     notifications: true,
     emailAlerts: true,
-    twoFactorAuth: false
+    twoFactorAuth: false,
   });
 
-  // Logout Confirmation Modal
   const LogoutModal = () => {
     if (!isLogoutModalOpen) return null;
 
@@ -42,20 +82,22 @@ const Student_account = ({ isOpen, onClose, isLoggedIn, setIsLoggedIn }) => {
         <div className="bg-gray-700 p-6 rounded-lg w-96 text-center">
           <LogOut className="mx-auto mb-4 w-12 h-12 text-red-500" />
           <h2 className="text-xl font-bold mb-4">Confirm Logout</h2>
-          <p className="text-gray-400 mb-6">Are you sure you want to log out?</p>
+          <p className="text-gray-400 mb-6">
+            Are you sure you want to log out?
+          </p>
           <div className="flex justify-center space-x-4">
-            <button 
+            <button
               onClick={() => setIsLogoutModalOpen(false)}
               className="px-4 py-2 bg-gray-600 rounded hover:bg-gray-500"
             >
               Cancel
             </button>
-            <button 
+            <button
               onClick={() => {
                 logout(); // from context
                 setIsLogoutModalOpen(false);
                 onClose();
-                navigate('/');
+                navigate("/");
               }}
               className="px-4 py-2 bg-red-600 rounded hover:bg-red-700"
             >
@@ -87,6 +129,7 @@ const Student_account = ({ isOpen, onClose, isLoggedIn, setIsLoggedIn }) => {
   // Update profile function
   const updateProfile = (newProfileData) => {
     setProfileData(newProfileData);
+    // If email was changed, you might want to update it in the backend
   };
 
   // Update settings function
@@ -94,70 +137,111 @@ const Student_account = ({ isOpen, onClose, isLoggedIn, setIsLoggedIn }) => {
     setSettingsData(newSettingsData);
   };
 
+
+
   if (!isOpen || !isLoggedIn) return null;
+
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+        <div className="bg-gray-800 rounded-lg p-8 flex flex-col items-center">
+          <Loader className="animate-spin w-8 h-8 mb-4 text-blue-500" />
+          <p className="text-lg">Loading profile data...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+        <div className="bg-gray-800 rounded-lg p-8">
+          <h2 className="text-xl font-bold mb-2 text-red-500">Error</h2>
+          <p className="mb-4">{error}</p>
+          <div className="flex justify-center">
+            <button
+              onClick={onClose}
+              className="px-4 py-2 bg-blue-600 rounded hover:bg-blue-700"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
       <div className="bg-gray-800 rounded-lg w-full max-w-md overflow-hidden">
         {/* Header with cover photo and close button */}
         <div className="relative h-32 bg-gradient-to-r from-blue-600 to-blue-400">
-          <button 
+          <button
             onClick={onClose}
             className="absolute top-2 right-2 bg-gray-800 p-1 rounded-full"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
           </button>
         </div>
-        
+
         {/* Profile section */}
         <div className="relative px-6 pb-6">
           {/* Profile picture */}
           <div className="absolute -top-16 left-6">
-            <img 
-              src="/api/placeholder/128/128" 
-              alt="User Profile" 
-              className="w-32 h-32 rounded-full border-4 border-gray-800 object-cover"
-            />
+            
           </div>
-          
+
           {/* Name and department */}
           <div className="mt-20">
-            <h2 className="text-2xl font-bold">{profileData.name}</h2>
+            <h2 className="text-2xl text-white font-bold">{profileData.name}</h2>
             <p className="text-gray-400">{profileData.department}</p>
           </div>
-          
+
           {/* Profile info */}
           <div className="mt-6 space-y-4">
             <div className="flex items-center">
               <Mail className="w-5 h-5 mr-3 text-gray-400" />
-              <span>{profileData.email}</span>
+              <span className="flex-1 text-white">{profileData.email}</span>
             </div>
             <div className="flex items-center">
               <IdCard className="w-5 h-5 mr-3 text-gray-400" />
-              <span>Student ID: {profileData.studentId}</span>
+              <span className="text-white">Student ID: {profileData.studentId}</span>
             </div>
             <div className="flex items-center">
               <Book className="w-5 h-5 mr-3 text-gray-400" />
-              <span>{profileData.year}</span>
+              <span className="text-white">{profileData.year}</span>
             </div>
             <div className="flex items-center">
               <Calendar className="w-5 h-5 mr-3 text-gray-400" />
-              <span>Joined {profileData.joinDate}</span>
+              <span className="text-white">Joined {profileData.joinDate}</span>
             </div>
           </div>
-          
+
           {/* Action buttons */}
           <div className="mt-8 grid grid-cols-2 gap-4">
-            <button 
+            <button
               onClick={handleOpenEditProfile}
               className="flex items-center justify-center px-4 py-2 bg-blue-600 rounded hover:bg-blue-700"
             >
               <Edit className="mr-2 w-4 h-4" />
               Edit Profile
             </button>
-            <button 
+            <button
               onClick={handleOpenSettings}
               className="flex items-center justify-center px-4 py-2 bg-gray-700 rounded hover:bg-gray-600"
             >
@@ -165,9 +249,9 @@ const Student_account = ({ isOpen, onClose, isLoggedIn, setIsLoggedIn }) => {
               Settings
             </button>
           </div>
-          
+
           {/* Logout button */}
-          <button 
+          <button
             onClick={() => setIsLogoutModalOpen(true)}
             className="mt-4 w-full flex items-center justify-center px-4 py-2 border border-gray-600 rounded-lg hover:bg-gray-700"
           >
@@ -179,23 +263,23 @@ const Student_account = ({ isOpen, onClose, isLoggedIn, setIsLoggedIn }) => {
 
       {/* Modals */}
       <LogoutModal />
-      
+
       {/* Render Modals explicitly */}
       {isEdit_Profile_Modal && (
-        <Edit_Profile_Modal 
-          isOpen={isEdit_Profile_Modal} 
-          onClose={handleCloseEditProfile} 
-          profileData={profileData} 
-          setProfileData={updateProfile} 
+        <Edit_Profile_Modal
+          isOpen={isEdit_Profile_Modal}
+          onClose={handleCloseEditProfile}
+          profileData={profileData}
+          setProfileData={updateProfile}
         />
       )}
-      
+
       {isSettings_Modal && (
-        <Settings_Modal 
-          isOpen={isSettings_Modal} 
-          onClose={handleCloseSettings} 
-          settingsData={settingsData} 
-          setSettingsData={updateSettings} 
+        <Settings_Modal
+          isOpen={isSettings_Modal}
+          onClose={handleCloseSettings}
+          settingsData={settingsData}
+          setSettingsData={updateSettings}
         />
       )}
     </div>
