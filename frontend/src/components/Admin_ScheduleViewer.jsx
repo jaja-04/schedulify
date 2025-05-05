@@ -97,7 +97,7 @@ function Admin_ScheduleViewer() {
   }
 
   return (
-    <div className="p-6 bg-slate-900 min-h-screen text-white">
+    <div className="p-6 bg-slate-900 min-h-screen -ml-10 text-white">
       <h1 className="text-2xl font-bold mb-6">Schedule Viewer</h1>
 
       {/* Section Selector */}
@@ -125,7 +125,7 @@ function Admin_ScheduleViewer() {
       </div>
 
       {/* Schedule Grid */}
-      <div className="overflow-auto max-w-full">
+      <div className="overflow-auto h-[75vh] w-[80vw]">
         <table className="table-fixed border-collapse border border-slate-600 w-full text-sm">
           <thead className="bg-slate-800 text-gray-200">
             <tr>
