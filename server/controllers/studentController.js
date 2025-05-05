@@ -22,3 +22,19 @@ exports.getStudentSchedule = async (req, res) => {
     res.status(500).json({ success: false, error: "Server error while fetching schedule." });
   }
 };
+
+
+
+exports.getAllStudents = async (req, res) => {
+  try {
+    const students = await Student.findAll({
+      include: [{ model: User, attributes: ["name", "section", "yearLevel"] }],
+      order: [["id", "ASC"]],
+    });
+
+    res.json({ success: true, data: students });
+  } catch (err) {
+    console.error("Error fetching all students:", err);
+    res.status(500).json({ success: false, error: "Server error while fetching students." });
+  }
+};

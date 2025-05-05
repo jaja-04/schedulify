@@ -1,31 +1,68 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { LogOut, Mail, IdCard, Book, Calendar, Edit, Settings } from "lucide-react";
 // Make sure these import paths are correct - adjust if your files are in different folders
 import Edit_Profile_Modal from "./Edit_Profile_Modal.jsx";
 import Settings_Modal from "./Settings_Modal.jsx";
 import { useAuth } from "../context/authContext.jsx";
+import axios from 'axios';
 
 const Faculty_account = ({ isOpen, onClose, isLoggedIn, setIsLoggedIn }) => {
   const navigate = useNavigate();
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   const [isEdit_Profile_Modal, setisEdit_Profile_Modal] = useState(false);
   const [isSettings_Modal, setisSettings_Modal] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const { logout } = useAuth();
+  // Extract user from the useAuth hook instead of currentUser
+  const { logout, user } = useAuth();
 
   // Faculty profile data
-  const [profileData, setProfileData] = useState({
-    name: "Dr. Jane Smith",
-    department: "Computer Science",
-    email: "jane.smith@university.edu",
-    facultyId: "CS2024-001",
-    title: "Professor",
-    joinDate: "August 2019",
-    phone: "555-987-6543",
-    office: "Room 102, Tech Building"
-  });
+  const [profileData, setProfileData] = useState(null);
 
+  useEffect(() => {
+    const fetchFacultyData = async () => {
+      if (!user?.email || !isOpen || profileData) return;
+  
+      try {
+        setLoading(true);
+        console.log("Fetching data for email:", user.email);
+        const response = await axios.get(`http://localhost:5000/api/users/role/faculty`);
+        const facultyList = response.data;
+  
+        const userData = facultyList.find(faculty => faculty.email === user.email);
+  
+        if (!userData) {
+          console.log("No matching faculty profile found for email:", user.email);
+          setError("No matching profile found");
+          return;
+        }
+  
+        setProfileData({
+          name: userData.name,
+          department: userData.department || "Computer Science",
+          email: userData.email,
+          facultyId: `FAC-${userData.id.toString().padStart(4, "0")}`,
+          title: userData.title || "Professor",
+          joinDate: new Date(userData.createdAt).toLocaleDateString(),
+          phone: userData.phone || "555-987-6543",
+          office: userData.office || "Room 102, Tech Building",
+        });
+      } catch (error) {
+        console.error("Error fetching faculty profile:", error);
+        setError(error.message || "Failed to fetch profile data");
+      } finally {
+        setLoading(false);
+      }
+    };
+  
+    fetchFacultyData();
+  }, [user?.email, isOpen]); // 👈 includes isOpen
+  
+  
+  
+  
   // Settings data
   const [settingsData, setSettingsData] = useState({
     theme: "dark",
@@ -33,6 +70,7 @@ const Faculty_account = ({ isOpen, onClose, isLoggedIn, setIsLoggedIn }) => {
     emailAlerts: true,
     twoFactorAuth: false
   });
+
 
   // Logout Confirmation Modal
   const LogoutModal = () => {
@@ -124,36 +162,52 @@ const Faculty_account = ({ isOpen, onClose, isLoggedIn, setIsLoggedIn }) => {
           </div>
           
           {/* Name and department */}
-          <div className="mt-20">
-            <h2 className="text-2xl font-bold">{profileData.name}</h2>
-            <p className="text-gray-400">{profileData.department}</p>
-          </div>
-          
-          {/* Profile info */}
-          <div className="mt-6 space-y-4">
-            <div className="flex items-center">
-              <Mail className="w-5 h-5 mr-3 text-gray-400" />
-              <span>{profileData.email}</span>
+          {loading ? (
+            <div className="text-center text-white p-4 mt-16">Loading profile...</div>
+          ) : error ? (
+            <div className="text-center text-red-500 p-4 mt-16">
+              <p>Error loading profile: {error}</p>
+              <p className="text-xs mt-2">Make sure your backend is running</p>
             </div>
-            <div className="flex items-center">
-              <IdCard className="w-5 h-5 mr-3 text-gray-400" />
-              <span>Faculty ID: {profileData.facultyId}</span>
+          ) : !profileData ? (
+            <div className="text-center text-white p-4 mt-16">
+              <p>No profile data found</p>
+              <p className="text-xs mt-2">Current user email: {user?.email || "Not available"}</p>
             </div>
-            <div className="flex items-center">
-              <Book className="w-5 h-5 mr-3 text-gray-400" />
-              <span>{profileData.title}</span>
-            </div>
-            <div className="flex items-center">
-              <Calendar className="w-5 h-5 mr-3 text-gray-400" />
-              <span>Joined {profileData.joinDate}</span>
-            </div>
-          </div>
+          ) : (
+            <>
+              <h2 className="text-2xl font-bold">{profileData.name}</h2>
+              <p className="text-gray-400">{profileData.department}</p>
+
+              {/* Profile info */}
+              <div className="mt-6 space-y-4">
+                <div className="flex items-center">
+                  <Mail className="w-5 h-5 mr-3 text-gray-400" />
+                  <span>{profileData.email}</span>
+                </div>
+                <div className="flex items-center">
+                  <IdCard className="w-5 h-5 mr-3 text-gray-400" />
+                  <span>Faculty ID: {profileData.facultyId}</span>
+                </div>
+                <div className="flex items-center">
+                  <Book className="w-5 h-5 mr-3 text-gray-400" />
+                  <span>{profileData.title}</span>
+                </div>
+                <div className="flex items-center">
+                  <Calendar className="w-5 h-5 mr-3 text-gray-400" />
+                  <span>Joined {profileData.joinDate}</span>
+                </div>
+              </div>
+            </>
+          )}
+
           
           {/* Action buttons */}
           <div className="mt-8 grid grid-cols-2 gap-4">
             <button 
               onClick={handleOpenEditProfile}
               className="flex items-center justify-center px-4 py-2 bg-blue-600 rounded hover:bg-blue-700"
+              disabled={loading || !profileData}
             >
               <Edit className="mr-2 w-4 h-4" />
               Edit Profile

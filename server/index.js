@@ -14,6 +14,7 @@ import Schedule from './models/Schedule.js';
 import Room from './models/Room.js';
 import scheduleRoutes from './routes/schedule.js';
 import courseRoutes from './routes/courseRoutes.js';
+import userRoutes from './routes/users.js';
 
 
 dotenv.config();
@@ -43,6 +44,7 @@ app.use("/api/schedule", scheduleRouter);
 app.use("/api/requests", requestsRouter);
 app.use('/api/schedule', scheduleRoutes);
 app.use("/api/courses", courseRoutes);
+app.use("/api/users", userRoutes);
 
 
 // Main startup logic inside an async function

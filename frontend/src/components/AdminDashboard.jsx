@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import Admin_GenerateSchedule from "./Admin_GenerateSchedule";
 import Admin_ScheduleViewer from "./Admin_ScheduleViewer";
 import axios from "axios"; // make sure axios is installed
+import AdminInstructors from "./AdminInstructors";
 
 const Admin_dashboard = () => {
   const [selectedMenu, setSelectedMenu] = useState("1st Year");
@@ -44,6 +45,7 @@ const Admin_dashboard = () => {
     { icon: HelpCircle, label: "Day-off Request" },
     { icon: Calendar, label: "Generate Schedule" },
     { icon: Calendar, label: "View Schedules" },
+    { icon: Calendar, label: "Instructors" },
   ];
 
   const handleYearLevelClick = (yearLevel) => {
@@ -198,6 +200,7 @@ const Admin_dashboard = () => {
       {selectedMenu === "Day-off Request" && <AdminRequest />}
       {selectedMenu === "Generate Schedule" && <Admin_GenerateSchedule />}
       {selectedMenu === "View Schedules" && <Admin_ScheduleViewer />}
+      {selectedMenu === "Instructors" && <AdminInstructors />}
 
       {/* Account Modal */}
       <AccountModal
