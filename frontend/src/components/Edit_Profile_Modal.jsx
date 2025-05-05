@@ -60,43 +60,6 @@ const Edit_Profile_Modal = ({ isOpen, onClose, profileData, setProfileData }) =>
             />
           </div>
           
-          <div>
-            <label className="block text-sm text-gray-400 mb-1">Year</label>
-            <select
-              name="year"
-              value={formData.year}
-              onChange={handleChange}
-              className="w-full p-2 bg-gray-800 border border-gray-600 rounded"
-            >
-              <option>First Year Student</option>
-              <option>Second Year Student</option>
-              <option>Third Year Student</option>
-              <option>Fourth Year Student</option>
-              <option>Graduate Student</option>
-            </select>
-          </div>
-          
-          <div>
-            <label className="block text-sm text-gray-400 mb-1">Phone</label>
-            <input
-              type="text"
-              name="phone"
-              value={formData.phone}
-              onChange={handleChange}
-              className="w-full p-2 bg-gray-800 border border-gray-600 rounded"
-            />
-          </div>
-          
-          <div>
-            <label className="block text-sm text-gray-400 mb-1">Address</label>
-            <input
-              type="text"
-              name="address"
-              value={formData.address}
-              onChange={handleChange}
-              className="w-full p-2 bg-gray-800 border border-gray-600 rounded"
-            />
-          </div>
           
           <div className="flex justify-end space-x-3 pt-4">
             <button
