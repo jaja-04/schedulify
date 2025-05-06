@@ -1,8 +1,10 @@
-const Schedule = require("../models/Schedule");
-const Student = require("../models/Student");
-const User = require("../models/User");
 
-exports.getStudentSchedule = async (req, res) => {
+
+import Schedule from "../models/Schedule.js";
+import Student from "../models/Student.js";
+import User from "../models/User.js";
+
+export const getStudentSchedule = async (req, res) => {
   try {
     const student = await Student.findOne({ where: { userId: req.user.id } });
 
@@ -24,17 +26,25 @@ exports.getStudentSchedule = async (req, res) => {
 };
 
 
-
-exports.getAllStudents = async (req, res) => {
+// In controller
+export const getAllStudents = async (req, res) => {
   try {
     const students = await Student.findAll({
-      include: [{ model: User, attributes: ["name", "section", "yearLevel"] }],
+      include: [{
+        model: User,
+        as: 'account', // must match alias
+        attributes: ["name"] // only fields that exist in User table
+      }],
       order: [["id", "ASC"]],
     });
+    
+    
 
-    res.json({ success: true, data: students });
+
+    res.json({ success: true, data: students }); 
   } catch (err) {
     console.error("Error fetching all students:", err);
-    res.status(500).json({ success: false, error: "Server error while fetching students." });
+    res.status(500).json({ success: false, error: err.message }); // Show actual error
   }
 };
+

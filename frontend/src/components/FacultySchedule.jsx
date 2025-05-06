@@ -9,8 +9,8 @@ const CourseSchedule = () => {
 
   const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
   const timeSlots = [
-    '8:00 AM', '9:00 AM', '10:00 AM', '11:00 AM', 
-    '12:00 PM', '1:00 PM', '2:00 PM', '3:00 PM', 
+    '8:00 AM', '9:00 AM', '10:00 AM', '11:00 AM',
+    '12:00 PM', '1:00 PM', '2:00 PM', '3:00 PM',
     '4:00 PM', '5:00 PM'
   ];
 
@@ -23,6 +23,100 @@ const CourseSchedule = () => {
       5: '3205'
     };
     return mapping[id] || 'Unknown';
+  };
+
+  const getDayAbbreviation = (day) => {
+    return day ? day.slice(0, 3) : '';
+  };
+
+  const formatTime = (timeString) => {
+    if (!timeString) return '';
+    const [hours, minutes] = timeString.split(':');
+    const hourNum = parseInt(hours, 10);
+    const period = hourNum >= 12 ? 'PM' : 'AM';
+    const hour12 = hourNum % 12 || 12;
+    return `${hour12}:${minutes}${period}`;
+  };
+
+  const convertToMinutes = (time) => {
+    const [hours, minutes] = time.split(':').map(Number);
+    return hours * 60 + minutes;
+  };
+
+  const courseInTimeSlot = (course, slotTime) => {
+    const slotParts = slotTime.split(/[: ]/);
+    let slotHour = parseInt(slotParts[0], 10);
+    const slotMinute = parseInt(slotParts[1], 10);
+    const isPM = slotParts[2] === 'PM';
+
+    if (isPM && slotHour !== 12) slotHour += 12;
+    if (!isPM && slotHour === 12) slotHour = 0;
+
+    const slotStart = slotHour * 60 + slotMinute;
+    const slotEnd = slotStart + 60;
+
+    const courseStart = convertToMinutes(course.startTime);
+    const courseEnd = convertToMinutes(course.endTime);
+
+    return courseStart < slotEnd && courseEnd > slotStart;
+  };
+
+  const getCoursesForSlot = (day, time) => {
+    return courses.filter(course =>
+      course.day === day && courseInTimeSlot(course, time)
+    );
+  };
+
+  const fetchSchedule = async () => {
+    if (!currentUser) return;
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('token');
+      if (!token) throw new Error('Authentication token not found');
+
+      const response = await fetch('http://localhost:5000/api/schedule', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (!response.ok) throw new Error('Failed to fetch schedule data');
+
+      const data = await response.json();
+      if (!data || !Array.isArray(data) || data.length === 0) {
+        setCourses([]);
+        return;
+      }
+
+      let userSchedule = [];
+      if (currentUser.role === 'student') {
+        userSchedule = data.filter(course => course.sectionId === currentUser.sectionId);
+      } else if (currentUser.role === 'faculty') {
+        userSchedule = data.filter(course =>
+          course.faculty === currentUser.id ||
+          course.faculty === currentUser.name
+        );
+      } else {
+        userSchedule = data;
+      }
+
+      const formattedCourses = userSchedule.map(course => ({
+        name: course.courseName || course.courseId,
+        room: course.room,
+        instructor: course.faculty,
+        section: getSectionName(course.sectionId),
+        time: `${getDayAbbreviation(course.day)} ${formatTime(course.startTime)}-${formatTime(course.endTime)}`,
+        startTime: course.startTime,
+        endTime: course.endTime,
+        day: course.day
+      }));
+
+      setCourses(formattedCourses);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -76,102 +170,24 @@ const CourseSchedule = () => {
   }, []);
 
   useEffect(() => {
-    const fetchSchedule = async () => {
-      if (!currentUser) return;
-      try {
-        setLoading(true);
-        const token = localStorage.getItem('token');
-        if (!token) throw new Error('Authentication token not found');
+    if (currentUser) {
+      fetchSchedule();
+    }
+  }, [currentUser]);
 
-        const response = await fetch('http://localhost:5000/api/schedule', {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-
-        if (!response.ok) throw new Error('Failed to fetch schedule data');
-
-        const data = await response.json();
-        if (!data || !Array.isArray(data) || data.length === 0) {
-          setCourses([]);
-          return;
-        }
-
-        let userSchedule = [];
-        if (currentUser.role === 'student') {
-          userSchedule = data.filter(course => course.sectionId === currentUser.sectionId);
-        } else if (currentUser.role === 'faculty') {
-          userSchedule = data.filter(course => 
-            course.faculty === currentUser.id || 
-            course.faculty === currentUser.name
-          );
-        } else {
-          userSchedule = data;
-        }
-
-        const formattedCourses = userSchedule.map(course => ({
-          name: course.courseName || course.courseId,
-          room: course.room,
-          instructor: course.faculty,
-          section: getSectionName(course.sectionId),
-          time: `${getDayAbbreviation(course.day)} ${formatTime(course.startTime)}-${formatTime(course.endTime)}`,
-          startTime: course.startTime,
-          endTime: course.endTime,
-          day: course.day
-        }));
-
-        setCourses(formattedCourses);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
+  // Re-fetch schedule when tab becomes visible
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        fetchSchedule();
       }
     };
 
-    fetchSchedule();
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, [currentUser]);
-
-  const getDayAbbreviation = (day) => {
-    return day ? day.slice(0, 3) : '';
-  };
-
-  const formatTime = (timeString) => {
-    if (!timeString) return '';
-    const [hours, minutes] = timeString.split(':');
-    const hourNum = parseInt(hours, 10);
-    const period = hourNum >= 12 ? 'PM' : 'AM';
-    const hour12 = hourNum % 12 || 12;
-    return `${hour12}:${minutes}`;
-  };
-
-  const convertToMinutes = (time) => {
-    const [hours, minutes] = time.split(':').map(Number);
-    return hours * 60 + minutes;
-  };
-
-  const courseInTimeSlot = (course, slotTime) => {
-    const slotParts = slotTime.split(/[: ]/);
-    let slotHour = parseInt(slotParts[0], 10);
-    const slotMinute = parseInt(slotParts[1], 10);
-    const isPM = slotParts[2] === 'PM';
-
-    if (isPM && slotHour !== 12) slotHour += 12;
-    if (!isPM && slotHour === 12) slotHour = 0;
-
-    const slotStart = slotHour * 60 + slotMinute;
-    const slotEnd = slotStart + 60;
-
-    const courseStart = convertToMinutes(course.startTime);
-    const courseEnd = convertToMinutes(course.endTime);
-
-    return courseStart < slotEnd && courseEnd > slotStart;
-  };
-
-  const getCoursesForSlot = (day, time) => {
-    return courses.filter(course =>
-      course.day === day && courseInTimeSlot(course, time)
-    );
-  };
 
   if (loading) {
     return (
@@ -209,7 +225,7 @@ const CourseSchedule = () => {
     <div className="bg-gray-900 p-6 rounded-lg">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold text-white">Course Schedule</h2>
-        <button 
+        <button
           onClick={() => window.print()}
           className="px-4 py-2 bg-blue-600 rounded-lg hover:bg-blue-700 flex items-center text-white"
         >
@@ -242,7 +258,6 @@ const CourseSchedule = () => {
                             <div className="text-xs">{course.room}</div>
                             <div className="text-xs">{course.instructor}</div>
                             <div className="text-xs">Sec: {course.section}</div>
-
                           </div>
                         ))
                       ) : (

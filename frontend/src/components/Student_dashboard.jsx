@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Home, List, User, HelpCircle } from "lucide-react";
 
 import CourseSchedule from "./Student_schedule";
@@ -9,7 +9,23 @@ const Student_dashboard = () => {
   const [selectedMenu, setSelectedMenu] = useState("Dashboard");
   const [isLoggedIn, setIsLoggedIn] = useState(true);
   const [isAccountModalOpen, setIsAccountModalOpen] = useState(false);
+  const [summaryCourses, setSummaryCourses] = useState([]);
 
+
+  useEffect(() => {
+    const fetchSummaryData = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/api/courses/summary");
+        const data = await response.json();
+        setSummaryCourses(data);
+      } catch (error) {
+        console.error("Failed to fetch course summary:", error);
+      }
+    };
+  
+    fetchSummaryData();
+  }, []);
+  
   const menuItems = [
     { icon: Home, label: "Dashboard" },
     { icon: List, label: "My Schedule" },
@@ -93,28 +109,18 @@ const Student_dashboard = () => {
                   <div className="space-y-2">
                     <div className="flex justify-between">
                       <span>Total Courses</span>
-                      <span className="font-bold">{courses.length}</span>
+                      <span className="font-bold">{summaryCourses.length}</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Total Credits</span>
                       <span className="font-bold">
-                        {courses.reduce((sum, course) => sum + course.credits, 0)}
+                        {summaryCourses.reduce((sum, course) => sum + course.units, 0)}
                       </span>
                     </div>
                   </div>
+
                 </div>
-                <div className="bg-gray-800 p-6 rounded-lg">
-                  <h3 className="text-lg font-semibold mb-4">Upcoming Class</h3>
-                  {courses.length > 0 ? (
-                    <div>
-                      <div className="font-bold">{courses[0].name}</div>
-                      <div className="text-gray-400">{courses[0].time}</div>
-                      <div className="text-gray-400">{courses[0].room}</div>
-                    </div>
-                  ) : (
-                    <p className="text-gray-400">No upcoming classes</p>
-                  )}
-                </div>
+               
               </div>
             </div>
           )}
